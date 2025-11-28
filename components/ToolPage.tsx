@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface ToolPageProps {
   tool: string;
-  children?: React.ReactNode; // ← ADD THIS
+  children?: React.ReactNode;
 }
 
 export default function ToolPage({ tool }: ToolPageProps) {
