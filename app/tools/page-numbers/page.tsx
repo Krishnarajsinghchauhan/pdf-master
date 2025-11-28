@@ -3,7 +3,7 @@ import ToolPage from "@/components/ToolPage";
 
 export default function PageNumbers() {
   return (
-    <ToolPage title="Add Page Numbers">
+    <ToolPage title="Add Page Numbers" tool="page-numbers">
       <FileUploader tool="page-numbers" />
     </ToolPage>
   );

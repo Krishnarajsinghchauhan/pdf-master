@@ -4,7 +4,7 @@ import FileUploader from "@/components/FileUploader";
 
 export default function Split() {
   return (
-    <ToolPage title="Split PDF">
+    <ToolPage title="Split PDF" tool="split">
       <FileUploader tool="split" />
     </ToolPage>
   );

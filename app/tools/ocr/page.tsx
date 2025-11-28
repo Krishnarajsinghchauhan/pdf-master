@@ -3,7 +3,7 @@ import ToolPage from "@/components/ToolPage";
 
 export default function OCR() {
   return (
-    <ToolPage title="OCR PDF (Scan to Text)">
+    <ToolPage title="OCR PDF (Scan to Text)" tool="ocr">
       <FileUploader tool="ocr" />
     </ToolPage>
   );

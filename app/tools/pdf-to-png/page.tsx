@@ -3,7 +3,7 @@ import ToolPage from "@/components/ToolPage";
 
 export default function PDFToPNG() {
   return (
-    <ToolPage title="PDF to PNG">
+    <ToolPage title="PDF to PNG" tool="pdf-to-png">
       <FileUploader tool="pdf-to-png" />
     </ToolPage>
   );

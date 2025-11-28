@@ -4,7 +4,7 @@ import FileUploader from "@/components/FileUploader";
 
 export default function MergePDF() {
   return (
-    <ToolPage title="Merge PDF">
+    <ToolPage title="Merge PDF" tool="merge">
       <FileUploader tool="merge" />
     </ToolPage>
   );
