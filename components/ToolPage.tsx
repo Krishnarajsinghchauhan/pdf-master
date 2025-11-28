@@ -5,6 +5,7 @@ import { useState } from "react";
 interface ToolPageProps {
   tool: string;
   children?: React.ReactNode;
+  title: string; // <-- MUST BE HERE
 }
 
 export default function ToolPage({ tool }: ToolPageProps) {
