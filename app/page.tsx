@@ -1,6 +1,6 @@
 // app/page.tsx
 import Link from "next/link";
-import GoogleAdBanner from "./ads/GoogleAdBanner"; // <-- client component
+import AdsterraNative from "./ads/AdsterraNative";
 
 const tools = [
   { name: "Merge PDF", path: "/tools/merge" },
@@ -45,7 +45,7 @@ export default function Home() {
     <>
       {/* ⭐ Top Ad */}
       <div className="flex justify-center mb-6">
-        <GoogleAdBanner />
+        <AdsterraNative />
       </div>
 
       {/* Main Tools Grid */}
@@ -64,7 +64,7 @@ export default function Home() {
 
       {/* ⭐ Bottom Ad */}
       <div className="flex justify-center mt-8">
-        <GoogleAdBanner />
+        <AdsterraNative />
       </div>
     </>
   );

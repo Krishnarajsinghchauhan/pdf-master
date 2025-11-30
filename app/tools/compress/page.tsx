@@ -1,10 +1,16 @@
+import AdsterraNative from "@/app/ads/AdsterraNative";
 import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
 
 export default function Compress() {
   return (
-    <ToolPage title="Compress PDF" tool="compress">
-      <FileUploader tool="compress" />
-    </ToolPage>
+    <>
+      <div className="flex justify-center mb-6">
+        <AdsterraNative />
+      </div>
+      <ToolPage title="Compress PDF" tool="compress">
+        <FileUploader tool="compress" />
+      </ToolPage>
+    </>
   );
 }
