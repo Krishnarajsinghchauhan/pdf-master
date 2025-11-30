@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pixelpdf.in/sitemap.xml

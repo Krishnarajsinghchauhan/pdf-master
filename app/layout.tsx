@@ -2,8 +2,21 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "PDF Tools Online",
-  description: "All PDF tools like merge, split, compress, convert, OCR, etc.",
+  title: "PixelPDF – Free Online PDF Tools",
+  description:
+    "Convert, compress, merge, split, edit, and protect PDFs online. Free PDF tools like PDF to Word, JPG to PDF, OCR PDF, PDF Editor, eSign PDF and more.",
+  metadataBase: new URL("https://pixelpdf.in"),
+  openGraph: {
+    title: "PixelPDF – Free Online PDF Tools",
+    description:
+      "Use 28+ free PDF tools: merge, compress, convert to Word, JPG, Excel, PPT, OCR, eSign, and more.",
+    url: "https://pixelpdf.in",
+    siteName: "PixelPDF",
+    type: "website",
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -14,12 +27,30 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google AdSense Verification */}
+        {/* Google Adsense */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4065099840146867"
           crossOrigin="anonymous"
         ></script>
+
+        {/* JSON-LD STRUCTURED DATA FOR SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "PixelPDF",
+              url: "https://pixelpdf.in",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://pixelpdf.in/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
       </head>
 
       <body className="bg-gray-100">
@@ -29,11 +60,10 @@ export default function RootLayout({
           </div>
         </header>
 
-        {/* Here we DO NOT add banner */}
         <main className="max-w-6xl mx-auto p-4">{children}</main>
 
         <footer className="py-6 text-center text-gray-600">
-          © 2025 PDF Master — All Rights Reserved
+          © {new Date().getFullYear()} PixelPDF — All Rights Reserved
         </footer>
       </body>
     </html>
