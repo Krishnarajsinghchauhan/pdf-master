@@ -25,6 +25,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const handlehome = () => {
+    window.location.href = "/";
+  };
   return (
     <html lang="en">
       <head>
@@ -56,7 +59,11 @@ export default function RootLayout({
 
       <body className="bg-gray-100">
         <header className="w-full bg-white p-4 shadow flex items-center">
-          <div style={{ overflow: "hidden", height: 36 }}>
+          <div
+            style={{ overflow: "hidden", height: 36 }}
+            onClick={handlehome}
+            className="cursor-pointer"
+          >
             <Image
               src="/232070245-removebg-preview.png"
               alt="hello"
