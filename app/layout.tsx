@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google Adsense */}
+        <link rel="icon" href="/232070245-removebg-preview.png" />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4065099840146867"
