@@ -11,8 +11,6 @@ export const metadata = {
   keywords: ["reorder pdf", "arrange pdf pages", "organize pdf pages"],
 };
 
-export const dynamic = "force-dynamic";
-
 export default function Reorder() {
   return (
     <>

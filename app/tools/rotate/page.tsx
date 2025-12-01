@@ -11,8 +11,6 @@ export const metadata = {
   keywords: ["rotate pdf", "rotate pdf pages", "turn pdf page"],
 };
 
-export const dynamic = "force-dynamic";
-
 export default function Rotate() {
   return (
     <>
