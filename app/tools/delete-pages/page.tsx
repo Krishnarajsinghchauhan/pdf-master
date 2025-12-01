@@ -10,8 +10,6 @@ export const metadata = {
   alternates: { canonical: "https://pixelpdf.in/tools/delete-pages" },
 };
 
-export const dynamic = "force-dynamic";
-
 export default function DeletePages() {
   return (
     <>

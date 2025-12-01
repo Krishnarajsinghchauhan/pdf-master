@@ -20,8 +20,6 @@ export const metadata = {
   ],
 };
 
-export const dynamic = "force-dynamic";
-
 // ==============================
 // 📌 MAIN PAGE
 // ==============================

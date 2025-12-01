@@ -2,8 +2,6 @@ import AdsterraNative from "@/app/ads/AdsterraNative";
 import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
 
-export const dynamic = "force-dynamic";
-
 export default function ESign() {
   return (
     <>

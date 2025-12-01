@@ -11,8 +11,6 @@ export const metadata = {
   keywords: ["jpg to pdf", "image to pdf", "jpeg to pdf", "convert jpg to pdf"],
 };
 
-export const dynamic = "force-dynamic";
-
 export default function JPGToPDF() {
   return (
     <>
