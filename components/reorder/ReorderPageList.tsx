@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 // Required for PDFJS worker
 // IMPORTANT: This path works in Next.js
