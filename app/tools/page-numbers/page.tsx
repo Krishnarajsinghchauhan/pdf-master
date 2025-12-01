@@ -1,3 +1,5 @@
+"use client";
+
 import AdsterraNative from "@/app/ads/AdsterraNative";
 import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
@@ -10,8 +12,6 @@ export const metadata = {
   alternates: { canonical: "https://pixelpdf.in/tools/page-numbers" },
   keywords: ["add page numbers pdf", "pdf page numbering", "number pages pdf"],
 };
-
-export const dynamic = "force-dynamic";
 
 export default function PageNumbers() {
   return (
