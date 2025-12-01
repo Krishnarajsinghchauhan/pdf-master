@@ -20,7 +20,7 @@ type ToolPageProps = {
 export default function ToolPage({ tool, title }: ToolPageProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState("idle");
-  const [downloadUrl, setDownloadUrl] = useState("");
+  const [downloadUrl, setDownloadUrl] = useState<string[]>([]);
 
   const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -89,7 +89,12 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
         const result = await fetch(`${API}/job/result/${jobID}`);
         const resultData = await result.json();
 
-        setDownloadUrl(resultData.file_url);
+        if (Array.isArray(resultData.file_urls)) {
+          setDownloadUrl(resultData.file_urls);
+        } else {
+          setDownloadUrl([resultData.file_url]);
+        }
+
         setStatus("completed");
       }
 
@@ -190,14 +195,17 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
               color="text-green-600"
             />
 
-            <a
-              href={downloadUrl}
-              download
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow hover:bg-green-700"
-            >
-              <FontAwesomeIcon icon={faCloudArrowDown} />
-              Download File
-            </a>
+            {downloadUrl.map((url, idx) => (
+              <a
+                key={url}
+                href={url}
+                download
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow hover:bg-green-700"
+              >
+                <FontAwesomeIcon icon={faCloudArrowDown} />
+                Download File{downloadUrl.length > 1 ? ` ${idx + 1}` : ""}
+              </a>
+            ))}
           </div>
         )}
         {status === "error" && (
