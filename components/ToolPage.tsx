@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -12,9 +12,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 type ToolPageProps = {
-  title: string;
   tool: string;
-  children: ReactNode;
+  children?: React.ReactNode;
+  title: string; // <-- MUST BE HERE
 };
 
 export default function ToolPage({ tool, title }: ToolPageProps) {
