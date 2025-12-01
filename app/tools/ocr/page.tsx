@@ -1,5 +1,3 @@
-"use client";
-
 import AdsterraNative from "@/app/ads/AdsterraNative";
 import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
@@ -18,6 +16,8 @@ export const metadata = {
     "pdf text recognition",
   ],
 };
+
+export const dynamic = "force-dynamic";
 
 export default function OCR() {
   return (
