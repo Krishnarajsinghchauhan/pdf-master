@@ -10,6 +10,8 @@ export const metadata = {
   alternates: { canonical: "https://pixelpdf.in/tools/word-to-pdf" },
 };
 
+export const dynamic = "force-dynamic";
+
 export default function WordToPDF() {
   return (
     <>

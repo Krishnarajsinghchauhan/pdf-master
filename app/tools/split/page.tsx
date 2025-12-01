@@ -12,6 +12,8 @@ export const metadata = {
   keywords: ["split pdf", "pdf splitter", "extract pdf pages", "separate pdf"],
 };
 
+export const dynamic = "force-dynamic";
+
 export default function Split() {
   return (
     <>

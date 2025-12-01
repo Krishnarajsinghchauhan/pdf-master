@@ -11,6 +11,8 @@ export const metadata = {
   keywords: ["compress pdf", "reduce pdf size", "pdf compressor", "shrink pdf"],
 };
 
+export const dynamic = "force-dynamic";
+
 export default function Compress() {
   return (
     <>
