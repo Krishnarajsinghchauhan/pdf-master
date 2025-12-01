@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,10 +11,11 @@ import {
   faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
 
-interface ToolPageProps {
-  tool: string;
+type ToolPageProps = {
   title: string;
-}
+  tool: string;
+  children: ReactNode;
+};
 
 export default function ToolPage({ tool, title }: ToolPageProps) {
   const [files, setFiles] = useState<File[]>([]);
