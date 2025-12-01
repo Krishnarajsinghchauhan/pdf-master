@@ -10,17 +10,19 @@ import {
   faCircleCheck,
   faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
+import ReorderPageList from "./reorder/ReorderPageList";
 
 type ToolPageProps = {
   tool: string;
   children?: React.ReactNode;
-  title: string; // <-- MUST BE HERE
+  title: string;
 };
 
 export default function ToolPage({ tool, title }: ToolPageProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState("idle");
   const [downloadUrl, setDownloadUrl] = useState<string[]>([]);
+  const [pageOrder, setPageOrder] = useState<string>("");
 
   const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -50,6 +52,11 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
   async function startProcessing() {
     if (files.length === 0) return alert("Please upload at least 1 file.");
 
+    // Reorder tool must require order
+    if (tool === "reorder" && !pageOrder) {
+      return alert("Please wait… generating page thumbnails.");
+    }
+
     setStatus("uploading");
 
     const uploaded: string[] = [];
@@ -66,6 +73,7 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
       body: JSON.stringify({
         tool,
         files: uploaded,
+        options: tool === "reorder" ? { order: pageOrder } : {},
       }),
     });
 
@@ -122,15 +130,16 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
         className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl p-8"
       >
         <label className="block text-center text-gray-700 font-semibold mb-4 text-lg">
-          Upload your files
+          Upload your PDF
         </label>
 
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-500 transition cursor-pointer">
           <input
             type="file"
-            multiple
+            multiple={tool !== "reorder"}
             className="hidden"
             id="fileInput"
+            accept="application/pdf"
             onChange={(e) => setFiles(Array.from(e.target.files || []))}
           />
 
@@ -160,6 +169,14 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
               </div>
             ))}
           </div>
+        )}
+
+        {/* 🔥 Reorder Page Preview */}
+        {tool === "reorder" && files.length === 1 && (
+          <ReorderPageList
+            file={files[0]}
+            onOrderChange={(order) => setPageOrder(order)}
+          />
         )}
 
         {/* Process Button */}
@@ -194,7 +211,6 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
               text="Your file is ready!"
               color="text-green-600"
             />
-
             {downloadUrl.map((url, idx) => (
               <a
                 key={url}
@@ -203,7 +219,7 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-green-600 text-white font-semibold shadow hover:bg-green-700"
               >
                 <FontAwesomeIcon icon={faCloudArrowDown} />
-                Download File{downloadUrl.length > 1 ? ` ${idx + 1}` : ""}
+                Download File {downloadUrl.length > 1 ? `#${idx + 1}` : ""}
               </a>
             ))}
           </div>
