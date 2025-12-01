@@ -1,5 +1,6 @@
 // app/layout.tsx
 import "./globals.css";
+import Image from "next/image";
 
 export const metadata = {
   title: "PixelPDF – Free Online PDF Tools",
@@ -54,9 +55,23 @@ export default function RootLayout({
       </head>
 
       <body className="bg-gray-100">
-        <header className="w-full bg-white p-4 shadow">
-          <div className="max-w-6xl mx-auto flex justify-between">
-            <h1 className="text-2xl font-bold text-red-600">PDF Master</h1>
+        <header className="w-full bg-white p-4 shadow flex items-center">
+          <div style={{ overflow: "hidden", height: 36 }}>
+            <Image
+              src="/232070245-removebg-preview.png"
+              alt="hello"
+              width={200}
+              height={40}
+              style={{
+                display: "block",
+                objectFit: "cover",
+                objectPosition: "center",
+                height: 40,
+                marginTop: -2,
+                marginBottom: -2,
+              }}
+              priority
+            />
           </div>
         </header>
 

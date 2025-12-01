@@ -2,6 +2,13 @@
 
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTimesCircle,
+  faFileAlt,
+  faUpload,
+} from "@fortawesome/free-solid-svg-icons";
 import ProcessingStatus from "./ProcessingStatus";
 
 interface FileUploaderProps {
@@ -17,7 +24,7 @@ export default function FileUploader({ tool }: FileUploaderProps) {
 
   const [downloadUrl, setDownloadUrl] = useState<string>("");
 
-  // Allowed file types per tool
+  // FILE TYPES
   const allowedTypes: Record<string, string[]> = {
     merge: ["application/pdf"],
     split: ["application/pdf"],
@@ -30,39 +37,31 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     "pdf-to-word": ["application/pdf"],
     "pdf-to-excel": ["application/pdf"],
     "pdf-to-ppt": ["application/pdf"],
-
     "word-to-pdf": [
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     ],
-
     "excel-to-pdf": [
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ],
-
     "ppt-to-pdf": [
       "application/vnd.ms-powerpoint",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ],
-
     "jpg-to-pdf": ["image/jpeg"],
     "pdf-to-jpg": ["application/pdf"],
     "png-to-pdf": ["image/png"],
     "pdf-to-png": ["application/pdf"],
-
     edit: ["application/pdf"],
     watermark: ["application/pdf"],
     "page-numbers": ["application/pdf"],
     "header-footer": ["application/pdf"],
-
     ocr: ["application/pdf"],
     "image-to-text": ["image/jpeg", "image/png"],
     "scanned-enhance": ["application/pdf"],
-
     esign: ["application/pdf"],
     "fillable-forms": ["application/pdf"],
-
     combine: [
       "application/pdf",
       "image/jpeg",
@@ -79,30 +78,29 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   const maxFileSizeMB = 200;
   const maxFiles = tool === "merge" || tool === "combine" ? 50 : 1;
 
-  // ------------------------------
-  // ⭐ FILE DROP
-  // ------------------------------
+  // ========================
+  // ⭐ FILE DROP HANDLER
+  // ========================
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       setError("");
-
       const newFiles = [...files];
 
       for (const file of acceptedFiles) {
         const valid = allowedTypes[tool]?.includes(file.type);
 
         if (!valid) {
-          setError("Unsupported file type for this tool.");
+          setError("❌ Unsupported file type for this tool.");
           continue;
         }
 
         if (file.size / 1024 / 1024 > maxFileSizeMB) {
-          setError(`File too large. Maximum size is ${maxFileSizeMB} MB.`);
+          setError(`❌ File too large. Max size: ${maxFileSizeMB} MB`);
           continue;
         }
 
         if (newFiles.length >= maxFiles) {
-          setError(`Maximum ${maxFiles} files allowed.`);
+          setError(`❌ Maximum ${maxFiles} files allowed.`);
           break;
         }
 
@@ -115,6 +113,7 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     [files, tool, maxFiles]
   );
 
+  // Remove file
   const onRemove = (index: number) => {
     const updated = [...files];
     updated.splice(index, 1);
@@ -128,11 +127,11 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     setDownloadUrl("");
   };
 
-  // ---------------------------------------------------------
-  // ⭐ STEP 4 — Upload File To S3 Using Presigned URL
-  // ---------------------------------------------------------
-  const uploadToS3 = async (file: File) => {
-    // 1. Ask backend for presigned URL
+  // ------------------------------
+  // ⭐ Upload + Job Creation Logic
+  // ------------------------------
+
+  async function uploadToS3(file: File) {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/upload/create-url`,
       {
@@ -144,19 +143,14 @@ export default function FileUploader({ tool }: FileUploaderProps) {
 
     const data = await res.json();
 
-    // 2. Upload file directly to S3 using PUT
     await fetch(data.url, {
       method: "PUT",
       body: file,
     });
 
-    // 3. Return final S3 URL
     return data.file_url;
-  };
+  }
 
-  // ---------------------------------------------------------
-  // ⭐ STEP 6 — Poll Status From Backend
-  // ---------------------------------------------------------
   async function pollStatus(jobID: string) {
     const interval = setInterval(async () => {
       const res = await fetch(`http://localhost:8080/job/status/${jobID}`);
@@ -164,11 +158,8 @@ export default function FileUploader({ tool }: FileUploaderProps) {
 
       if (data.status === "completed") {
         clearInterval(interval);
-
-        // Get final output file URL
         const out = await fetch(`http://localhost:8080/job/result/${jobID}`);
         const resultData = await out.json();
-
         setDownloadUrl(resultData.file_url);
         setStatus("completed");
       }
@@ -180,39 +171,23 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     }, 1500);
   }
 
-  // ---------------------------------------------------------
-  // ⭐ STEP 5 — Process Button (Upload → Create Job → Polling)
-  // ---------------------------------------------------------
   const onProcess = async () => {
     setStatus("uploading");
 
-    // Upload all files to S3
     const uploadedURLs = [];
-    for (const f of files) {
-      const url = await uploadToS3(f);
-      uploadedURLs.push(url);
-    }
+    for (const f of files) uploadedURLs.push(await uploadToS3(f));
 
     setStatus("creating-job");
 
-    // Create job request
     const jobRes = await fetch("http://localhost:8080/job/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        tool,
-        files: uploadedURLs,
-        options: {},
-      }),
+      body: JSON.stringify({ tool, files: uploadedURLs, options: {} }),
     });
 
     const jobData = await jobRes.json();
-    const jobID = jobData.job_id;
-
     setStatus("processing");
-
-    // Start polling
-    pollStatus(jobID);
+    pollStatus(jobData.job_id);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -221,7 +196,7 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   });
 
   // ------------------------------
-  // ⭐ Show processing UI
+  // ⭐ STATUS SCREEN
   // ------------------------------
   if (status !== "idle") {
     return (
@@ -229,14 +204,14 @@ export default function FileUploader({ tool }: FileUploaderProps) {
         status={status}
         message={
           status === "uploading"
-            ? "Uploading your files to cloud storage…"
+            ? "⏳ Uploading your files…"
             : status === "creating-job"
-            ? "Preparing your job request…"
+            ? "⚙️ Preparing processing task…"
             : status === "processing"
-            ? "Processing your file with optimized servers…"
+            ? "🔄 Processing your file…"
             : status === "completed"
-            ? "Your file has been successfully processed!"
-            : "Unexpected error occurred"
+            ? "🎉 Your file is ready!"
+            : "❌ Something went wrong"
         }
         downloadUrl={downloadUrl}
         onReset={resetAll}
@@ -245,71 +220,107 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   }
 
   // ------------------------------
-  // ⭐ Normal UI
+  // ⭐ MAIN PREMIUM UI
   // ------------------------------
   return (
-    <div className="mt-4">
-      <div
-        {...getRootProps()}
-        className={`border-2 border-dashed rounded p-10 text-center transition
-        ${
-          isDragActive
-            ? "bg-blue-50 border-blue-400"
-            : "bg-gray-50 border-gray-300"
-        }`}
+    <div className="mt-6">
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer backdrop-blur-lg shadow-lg
+          ${
+            isDragActive
+              ? "bg-blue-100 border-blue-500"
+              : "bg-white/60 border-gray-300"
+          }
+        `}
       >
-        <input {...getInputProps()} />
-        <p className="text-gray-600 text-lg">
-          {isDragActive
-            ? "Drop your files…"
-            : "Drag & drop files or click to upload"}
-        </p>
+        <div {...getRootProps()}>
+          <input {...getInputProps()} />
 
-        <p className="text-sm text-gray-400 mt-2">
-          Allowed: {allowedTypes[tool]?.map((t) => t.split("/")[1]).join(", ")}
-        </p>
-      </div>
+          <motion.div
+            initial={{ scale: 0.9 }}
+            animate={{ scale: 1 }}
+            className="flex flex-col items-center"
+          >
+            <div className="w-20 h-20 rounded-full bg-linear-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center shadow-xl mb-4">
+              <FontAwesomeIcon icon={faUpload} size="2x" />
+            </div>
 
-      {/* Error Message */}
-      {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+            <p className="text-gray-700 text-lg font-semibold">
+              {isDragActive
+                ? "Drop your files…"
+                : "Drag & drop or click to upload"}
+            </p>
 
-      {/* Preview List */}
+            <p className="text-sm text-gray-500 mt-2">
+              Allowed:{" "}
+              {allowedTypes[tool]?.map((t) => t.split("/")[1]).join(", ")}
+            </p>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* ❗ Errors */}
+      {error && (
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-red-600 text-sm mt-3 font-semibold"
+        >
+          {error}
+        </motion.p>
+      )}
+
+      {/* 📄 FILE PREVIEWS */}
       {files.length > 0 && (
         <div className="mt-5 space-y-3">
           {files.map((file, index) => (
-            <div
+            <motion.div
               key={index}
-              className="flex items-center justify-between bg-white shadow p-3 rounded"
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center justify-between p-4 bg-white rounded-xl shadow-md hover:shadow-lg transition"
             >
-              <div>
-                <p className="font-medium">{file.name}</p>
-                <p className="text-sm text-gray-500">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB
-                </p>
+              <div className="flex items-center gap-3">
+                <FontAwesomeIcon
+                  className="text-gray-500"
+                  icon={faFileAlt}
+                  size="lg"
+                />
+                <div>
+                  <p className="font-semibold">{file.name}</p>
+                  <p className="text-gray-500 text-sm">
+                    {(file.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
               </div>
 
               <button
                 onClick={() => onRemove(index)}
-                className="text-red-500 text-sm hover:underline"
+                className="text-red-500 hover:text-red-700 transition"
               >
-                Remove
+                <FontAwesomeIcon icon={faTimesCircle} size="lg" />
               </button>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
 
-      {/* Process Button */}
-      <button
+      {/* 🚀 PROCESS BUTTON */}
+      <motion.button
+        whileTap={{ scale: 0.97 }}
         onClick={onProcess}
         disabled={files.length === 0}
-        className={`mt-6 w-full py-3 rounded text-white font-semibold transition 
+        className={`mt-8 w-full py-4 rounded-xl text-white text-lg font-semibold shadow-lg transition
           ${
-            files.length === 0 ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-          }`}
+            files.length === 0
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-linear-to-r from-blue-600 to-indigo-600 hover:opacity-90"
+          }
+        `}
       >
-        Start Processing
-      </button>
+        Start Processing →
+      </motion.button>
     </div>
   );
 }
