@@ -1,5 +1,3 @@
-"use client";
-
 import AdsterraNative from "@/app/ads/AdsterraNative";
 import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
