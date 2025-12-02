@@ -18,9 +18,7 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
   >([]);
   const [loading, setLoading] = useState(true);
 
-  // ----------------------------
-  // Load PDF
-  // ----------------------------
+  // Load PDF ONLY when file changes
   useEffect(() => {
     const loadPdf = async () => {
       setLoading(true);
@@ -39,12 +37,11 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        // FIXED (correct rendering)
         await page.render({ canvasContext: ctx, viewport }).promise;
 
         tmp.push({
-          id: crypto.randomUUID(), // stable key
-          pageNumber: i, // REAL page
+          id: crypto.randomUUID(),
+          pageNumber: i,
           img: canvas.toDataURL("image/jpeg"),
         });
       }
@@ -52,16 +49,15 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
       setPages(tmp);
       setLoading(false);
 
-      // send order
+      // initial order
       onOrderChange(tmp.map((p) => p.pageNumber).join(","));
     };
 
     loadPdf();
-  }, [file, onOrderChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]); // FIXED: removed onOrderChange dependency
 
-  // ----------------------------
-  // onDragEnd
-  // ----------------------------
+  // Drag & Drop
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function onDragEnd(result: any) {
     if (!result.destination) return;
@@ -71,12 +67,11 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
     items.splice(result.destination.index, 0, moved);
 
     setPages(items);
+
+    // send updated order
     onOrderChange(items.map((p) => p.pageNumber).join(","));
   }
 
-  // ----------------------------
-  // UI
-  // ----------------------------
   if (loading) {
     return (
       <p className="text-center text-gray-600 mt-6">Generating previews…</p>
