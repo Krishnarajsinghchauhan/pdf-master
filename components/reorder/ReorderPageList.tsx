@@ -52,12 +52,13 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
       setPages(tempPages);
       setLoading(false);
 
-      // initial order
+      // initial order only once
       onOrderChange(tempPages.map((p) => p.id).join(","));
     };
 
     loadPdf();
-  }, [file, onOrderChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [file]); // only when file changes
 
   // ----------------------------
   // Drag & Drop Handler
