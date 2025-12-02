@@ -2,13 +2,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import * as pdfjsLib from "pdfjs-dist";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 // Required for PDFJS worker
 // IMPORTANT: This path works in Next.js
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  "//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
 
 interface Props {
   file: File;
