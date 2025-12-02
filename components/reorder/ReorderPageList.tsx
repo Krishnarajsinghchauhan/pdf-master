@@ -2,7 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
+
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 // Required for PDFJS worker
@@ -40,7 +41,7 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
-        await page.render({ canvasContext: ctx, canvas, viewport }).promise;
+        await page.render({ canvasContext: ctx, viewport }).promise;
 
         tempPages.push({
           id: String(i),
