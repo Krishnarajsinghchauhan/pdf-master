@@ -3,11 +3,8 @@
 
 import { useEffect, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.js";
-
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-// Required for PDFJS worker
-// IMPORTANT: This path works in Next.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = "/pdfjs/pdf.worker.min.js";
 
 interface Props {
@@ -16,21 +13,22 @@ interface Props {
 }
 
 export default function ReorderPageList({ file, onOrderChange }: Props) {
-  const [pages, setPages] = useState<{ id: string; img: string }[]>([]);
+  const [pages, setPages] = useState<
+    { id: string; pageNumber: number; img: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   // ----------------------------
-  // Load PDF thumbnails
+  // Load PDF
   // ----------------------------
   useEffect(() => {
     const loadPdf = async () => {
       setLoading(true);
 
-      const arrayBuffer = await file.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const buffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const tempPages: any[] = [];
+      const tmp: { id: string; pageNumber: number; img: string }[] = [];
 
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
@@ -41,27 +39,28 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
+        // FIXED (correct rendering)
         await page.render({ canvasContext: ctx, viewport }).promise;
 
-        tempPages.push({
-          id: String(i),
+        tmp.push({
+          id: crypto.randomUUID(), // stable key
+          pageNumber: i, // REAL page
           img: canvas.toDataURL("image/jpeg"),
         });
       }
 
-      setPages(tempPages);
+      setPages(tmp);
       setLoading(false);
 
-      // initial order only once
-      onOrderChange(tempPages.map((p) => p.id).join(","));
+      // send order
+      onOrderChange(tmp.map((p) => p.pageNumber).join(","));
     };
 
     loadPdf();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]); // only when file changes
+  }, [file, onOrderChange]);
 
   // ----------------------------
-  // Drag & Drop Handler
+  // onDragEnd
   // ----------------------------
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function onDragEnd(result: any) {
@@ -72,9 +71,7 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
     items.splice(result.destination.index, 0, moved);
 
     setPages(items);
-
-    // update order string
-    onOrderChange(items.map((p) => p.id).join(","));
+    onOrderChange(items.map((p) => p.pageNumber).join(","));
   }
 
   // ----------------------------
@@ -82,9 +79,7 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
   // ----------------------------
   if (loading) {
     return (
-      <p className="text-center text-gray-600 mt-6">
-        Generating page previews…
-      </p>
+      <p className="text-center text-gray-600 mt-6">Generating previews…</p>
     );
   }
 
@@ -102,20 +97,20 @@ export default function ReorderPageList({ file, onOrderChange }: Props) {
             >
               {pages.map((p, index) => (
                 <Draggable key={p.id} draggableId={p.id} index={index}>
-                  {(draggableProvided) => (
+                  {(drag) => (
                     <div
-                      ref={draggableProvided.innerRef}
-                      {...draggableProvided.draggableProps}
-                      {...draggableProvided.dragHandleProps}
-                      className="cursor-move p-2 rounded-lg bg-white shadow hover:shadow-lg transition"
+                      ref={drag.innerRef}
+                      {...drag.draggableProps}
+                      {...drag.dragHandleProps}
+                      className="cursor-move p-2 rounded-lg bg-white shadow hover:shadow-lg"
                     >
                       <img
                         src={p.img}
-                        className="w-32 h-auto rounded border"
-                        alt={`Page ${p.id}`}
+                        className="w-32 rounded border"
+                        alt={`Page ${p.pageNumber}`}
                       />
                       <p className="text-center font-semibold mt-1">
-                        Page {p.id}
+                        Page {p.pageNumber}
                       </p>
                     </div>
                   )}
