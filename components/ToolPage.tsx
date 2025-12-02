@@ -10,7 +10,7 @@ import {
   faCircleCheck,
   faCircleExclamation,
 } from "@fortawesome/free-solid-svg-icons";
-import ReorderPageList from "./reorder/ReorderPageList";
+import ReorderPageList from "@/components/ReorderPageListWrapper";
 
 type ToolPageProps = {
   tool: string;
