@@ -3,31 +3,42 @@
 import { useState } from "react";
 import WatermarkControls from "@/components/WatermarkControls";
 import FileUploader from "@/components/FileUploader";
-import PdfPreviewInteractive from "@/components/PdfPreviewInteractive";
+import PdfPreview from "@/components/PdfPreview";
 import JobStatus from "@/components/JobStatus";
 
 export default function WatermarkClient() {
   const [file, setFile] = useState<File | null>(null);
-  const [options, setOptions] = useState<{ type: string }>({ type: "text" });
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [options, setOptions] = useState({});
   const [jobId, setJobId] = useState<string | null>(null);
+
+  // Preview URL is set directly in onFileSelected callback, so no effect needed here.
 
   return (
     <div className="space-y-6">
-      {/* PREVIEW */}
-      {file && <PdfPreviewInteractive file={file} options={options} />}
-
-      {/* CONTROLS */}
-      <WatermarkControls onChange={setOptions} />
-
-      {/* FILE UPLOADER */}
+      {/* 1) File Upload */}
       <FileUploader
         tool="watermark"
         options={options}
-        onFileSelected={setFile}
+        onFileSelected={(selectedFile: File | null) => {
+          setFile(selectedFile);
+          if (selectedFile) {
+            const url = URL.createObjectURL(selectedFile);
+            setPreviewUrl(url);
+          } else {
+            setPreviewUrl(null);
+          }
+        }}
         onJobCreated={setJobId}
       />
 
-      {/* JOB STATUS */}
+      {/* 2) PDF PREVIEW */}
+      {previewUrl && <PdfPreview url={previewUrl} />}
+
+      {/* 3) Controls */}
+      <WatermarkControls onChange={setOptions} />
+
+      {/* 4) Job Status + Download link */}
       {jobId && <JobStatus jobId={jobId} />}
     </div>
   );
