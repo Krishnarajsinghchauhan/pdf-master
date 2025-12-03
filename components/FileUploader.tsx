@@ -12,6 +12,7 @@ import {
 import ProcessingStatus from "./ProcessingStatus";
 
 interface FileUploaderProps {
+  options: object;
   tool: string;
 }
 
