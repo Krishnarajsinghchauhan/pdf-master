@@ -248,8 +248,12 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: maxFiles > 1,
-    accept: allowedTypes[tool]?.reduce((acc, type) => {
-      acc[type] = [];
+    accept: allowedTypes[tool]?.reduce((acc, mime) => {
+      const ext = mime.split("/")[1];
+      acc[mime] = [
+        `.${ext.replace("jpeg", "jpg")}`,
+        `.${ext.replace("jpg", "jpeg")}`,
+      ];
       return acc;
     }, {} as Record<string, string[]>),
   });
