@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -24,20 +25,30 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
   const [downloadUrl, setDownloadUrl] = useState<string[]>([]);
   const [pageOrder, setPageOrder] = useState<string>("");
 
-  // This state captures watermark options from WatermarkClient
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-  const [options, setOptions] = useState<any>({});
-
   const API = process.env.NEXT_PUBLIC_API_URL;
 
   // ----------------------------
   // Upload to S3
   // ----------------------------
   async function uploadToS3(file: File) {
+    const event = new CustomEvent("watermark-options-request");
+    window.dispatchEvent(event);
+
+    const watermarkOptions = (window as any).watermarkOptions || {};
+
     const res = await fetch(`${API}/upload/create-url`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fileName: file.name }),
+      body: JSON.stringify({
+        tool,
+        fileName: file.name,
+        options:
+          tool === "watermark"
+            ? watermarkOptions
+            : tool === "reorder"
+            ? { order: pageOrder }
+            : {},
+      }),
     });
 
     const data = await res.json();
@@ -56,6 +67,7 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
   async function startProcessing() {
     if (files.length === 0) return alert("Please upload at least 1 file.");
 
+    // Reorder tool must require order
     if (tool === "reorder" && !pageOrder) {
       return alert("Please wait… generating page thumbnails.");
     }
@@ -70,30 +82,20 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
 
     setStatus("creating-job");
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const payload: any = {
-      tool,
-      files: uploaded,
-      options: {},
-    };
-
-    // 🔥 Forward watermark options
-    if (tool === "watermark") {
-      payload.options = options;
-    }
-
-    // 🔥 Reorder tool
-    if (tool === "reorder") {
-      payload.options = { order: pageOrder };
-    }
-
     const res = await fetch(`${API}/job/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        tool,
+        files: uploaded,
+        options: tool === "reorder" ? { order: pageOrder } : {},
+      }),
     });
 
     const data = await res.json();
+    window.dispatchEvent(
+      new CustomEvent("job-created", { detail: { jobId: data.job_id } })
+    );
     pollStatus(data.job_id);
   }
 
@@ -126,22 +128,24 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
         clearInterval(interval);
         setStatus("error");
       }
-    }, 1400);
+    }, 1500);
   }
 
   // ----------------------------
-  // MAIN UI
+  // Main UI
   // ----------------------------
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
       {/* Page Title */}
-      <h1 className="text-4xl font-extrabold text-center mb-8">{title}</h1>
+      <h1 className="text-4xl font-extrabold text-center bg-linear-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text drop-shadow mb-8">
+        {title}
+      </h1>
 
-      {/* Upload Section */}
+      {/* Upload Box */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl bg-white shadow-xl p-8"
+        className="rounded-2xl bg-white/70 backdrop-blur-xl border border-white/30 shadow-xl p-8"
       >
         <label className="block text-center text-gray-700 font-semibold mb-4 text-lg">
           Upload your PDF
@@ -167,7 +171,7 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
           </label>
         </div>
 
-        {/* Uploaded files */}
+        {/* File List */}
         {files.length > 0 && (
           <div className="mt-6 space-y-3">
             {files.map((file) => (
@@ -184,7 +188,7 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
           </div>
         )}
 
-        {/* Reorder tool */}
+        {/* 🔥 Reorder Page Preview */}
         {tool === "reorder" && files.length === 1 && (
           <ReorderPageList
             file={files[0]}
@@ -192,43 +196,40 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
           />
         )}
 
-        {/* Start Processing */}
+        {/* Process Button */}
         <button
           onClick={startProcessing}
           disabled={files.length === 0}
           className={`mt-6 w-full py-4 rounded-xl font-semibold text-white text-lg shadow-md transition ${
             files.length === 0
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
+              : "bg-linear-to-r from-blue-600 to-blue-700 hover:opacity-90"
           }`}
         >
           Start Processing
         </button>
       </motion.div>
 
-      {/* ⭐ CUSTOM TOOL UI (Watermark Controls, Preview etc.) */}
-      <div className="mt-10">{children}</div>
+      <div className="mt-6">{children}</div>
 
-      {/* Status & Download */}
+      {/* Status Box */}
       <div className="text-center mt-8">
         {status === "uploading" && (
-          <Status icon={faSpinner} text="Uploading…" spin />
+          <StatusIndicator icon={faSpinner} text="Uploading files…" spin />
         )}
         {status === "creating-job" && (
-          <Status icon={faSpinner} text="Preparing job…" spin />
+          <StatusIndicator icon={faSpinner} text="Preparing your job…" spin />
         )}
         {status === "processing" && (
-          <Status icon={faSpinner} text="Processing…" spin />
+          <StatusIndicator icon={faSpinner} text="Processing…" spin />
         )}
-
         {status === "completed" && (
           <div className="space-y-4">
-            <Status
+            <StatusIndicator
               icon={faCircleCheck}
               text="Your file is ready!"
               color="text-green-600"
             />
-
             {downloadUrl.map((url, idx) => (
               <a
                 key={url}
@@ -242,9 +243,8 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
             ))}
           </div>
         )}
-
         {status === "error" && (
-          <Status
+          <StatusIndicator
             icon={faCircleExclamation}
             text="Something went wrong"
             color="text-red-600"
@@ -258,8 +258,13 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
 // -----------------------------------------
 // Reusable Status Component
 // -----------------------------------------
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function Status({ icon, text, color = "text-blue-600", spin = false }: any) {
+function StatusIndicator({
+  icon,
+  text,
+  color = "text-blue-600",
+  spin = false,
+}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+any) {
   return (
     <div className="flex flex-col items-center gap-3">
       <FontAwesomeIcon

@@ -1,35 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-type WatermarkValues = {
-  type: string;
-  text: string;
-  imageUrl: string;
-  opacity: string;
-  fontSize: string;
-  color: string;
-  angle: string;
-  position: string;
-  scale: string;
-  repeat: string;
-};
-
-interface WatermarkControlsProps {
-  onChange: (values: WatermarkValues) => void;
-}
-
-export default function WatermarkControls({
-  onChange,
-}: WatermarkControlsProps) {
-  const [type, setType] = useState("text");
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const update = (key: any, value: any) => {
-    const newState = { ...values, [key]: value };
-    setValues(newState);
-    onChange(newState);
-  };
-
+export default function WatermarkControls({ onChange }: any) {
   const [values, setValues] = useState({
     type: "text",
     text: "WATERMARK",
@@ -43,10 +16,29 @@ export default function WatermarkControls({
     repeat: "false",
   });
 
+  const update = (key: any, value: any) => {
+    const newState = { ...values, [key]: value };
+    setValues(newState);
+    onChange(newState);
+
+    // 🔥 expose to ToolPage
+    (window as any).watermarkOptions = newState;
+  };
+
+  // listen when ToolPage requests watermark options
+  useEffect(() => {
+    function send() {
+      (window as any).watermarkOptions = values;
+    }
+    window.addEventListener("watermark-options-request", send);
+    return () => window.removeEventListener("watermark-options-request", send);
+  }, [values]);
+
   return (
     <div className="border rounded-lg p-4 my-4 bg-white shadow-sm">
-      {/* Type Switch */}
       <h3 className="font-semibold mb-3 text-lg">Watermark Type</h3>
+
+      {/* TYPE SWITCH */}
       <div className="flex gap-4 mb-4">
         <button
           className={`px-4 py-2 rounded ${
@@ -67,7 +59,7 @@ export default function WatermarkControls({
         </button>
       </div>
 
-      {/* Text Watermark */}
+      {/* TEXT WATERMARK */}
       {values.type === "text" && (
         <div className="mb-4">
           <label className="font-medium mb-1 block">Text</label>
@@ -80,20 +72,17 @@ export default function WatermarkControls({
         </div>
       )}
 
-      {/* Image Watermark */}
+      {/* IMAGE WATERMARK */}
       {values.type === "image" && (
         <div className="mb-4">
-          <label className="font-medium mb-1 block">Upload Image</label>
+          <label className="font-medium block mb-1">Upload Image</label>
           <input
             type="file"
             accept="image/*"
-            className="w-full"
-            onChange={async (e) => {
-              const files = e.target.files;
-              if (!files || files.length === 0) return;
-              const file = files[0];
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
 
-              // Convert to base64
               const reader = new FileReader();
               reader.onload = () => update("imageUrl", reader.result);
               reader.readAsDataURL(file);
@@ -129,7 +118,7 @@ export default function WatermarkControls({
         />
       </div>
 
-      {/* Font Size (for text) */}
+      {/* Font Size */}
       {values.type === "text" && (
         <div className="mb-4">
           <label className="font-medium mb-1 block">
@@ -146,7 +135,7 @@ export default function WatermarkControls({
         </div>
       )}
 
-      {/* Image Scale (for image) */}
+      {/* Image Scale */}
       {values.type === "image" && (
         <div className="mb-4">
           <label className="font-medium mb-1 block">
@@ -163,7 +152,7 @@ export default function WatermarkControls({
         </div>
       )}
 
-      {/* Color (text only) */}
+      {/* Color */}
       {values.type === "text" && (
         <div className="mb-4">
           <label className="font-medium block mb-1">Color</label>
@@ -175,7 +164,7 @@ export default function WatermarkControls({
         </div>
       )}
 
-      {/* Position */}
+      {/* POSITION */}
       <div className="mb-4">
         <label className="font-medium block mb-1">Position</label>
         <select
@@ -195,7 +184,7 @@ export default function WatermarkControls({
         </select>
       </div>
 
-      {/* Repeat toggle */}
+      {/* REPEAT */}
       <div>
         <label className="font-medium block mb-1">
           Repeat / Tile Watermark
