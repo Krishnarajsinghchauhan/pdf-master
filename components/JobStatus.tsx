@@ -6,9 +6,11 @@ export default function JobStatus({ jobId }: { jobId: string }) {
   const [status, setStatus] = useState("processing");
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
+  const API = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     const interval = setInterval(async () => {
-      const res = await fetch(`/api/job-status?id=${jobId}`);
+      const res = await fetch(`${API}/job/status/${jobId}`);
       const data = await res.json();
 
       setStatus(data.status);
@@ -19,6 +21,7 @@ export default function JobStatus({ jobId }: { jobId: string }) {
     }, 2000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId]);
 
   if (downloadUrl)
