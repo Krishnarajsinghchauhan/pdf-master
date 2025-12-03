@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import WatermarkControls from "@/components/WatermarkControls";
 import PdfPreview from "@/components/PdfPreview";
 import JobStatus from "@/components/JobStatus";
@@ -37,6 +37,20 @@ export default function WatermarkClient() {
 
     reader.readAsArrayBuffer(file);
   }
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      const file = e.detail;
+      if (!file) return;
+
+      setSelectedFile(file);
+      generatePreview(file, options);
+    };
+
+    window.addEventListener("pdf-selected", handler);
+    return () => window.removeEventListener("pdf-selected", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options]);
 
   return (
     <div className="mt-6 space-y-6">

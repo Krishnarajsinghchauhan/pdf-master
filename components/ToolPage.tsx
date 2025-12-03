@@ -157,7 +157,17 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
             multiple={tool !== "reorder"}
             className="hidden"
             id="fileInput"
-            onChange={(e) => setFiles(Array.from(e.target.files || []))}
+            onChange={(e) => {
+              const arr = Array.from(e.target.files || []);
+              setFiles(arr);
+
+              const file = e.target.files?.[0];
+              if (file) {
+                window.dispatchEvent(
+                  new CustomEvent("pdf-selected", { detail: file })
+                );
+              }
+            }}
           />
 
           <label htmlFor="fileInput" className="cursor-pointer">
