@@ -15,27 +15,42 @@ export default function WatermarkClient() {
   const [options, setOptions] = useState<any>({});
 
   async function generatePreview(file: File, opts: any) {
-    const reader = new FileReader();
+    // 1. request signed URL
+    const res1 = await fetch(`${API}/upload/create-url`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tool: "watermark-preview",
+        fileName: "preview_" + file.name,
+        options: {},
+      }),
+    });
 
-    reader.onload = async () => {
-      const pdfUrl = URL.createObjectURL(file);
+    const uploadData = await res1.json();
 
-      const res = await fetch(`${API}/watermark/preview`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          pdfUrl,
-          options: opts,
-        }),
-      });
+    // 2. upload file to the signed URL
+    await fetch(uploadData.url, {
+      method: "PUT",
+      body: file,
+    });
 
-      const data = await res.json();
-      if (data.preview_url) {
-        setPreviewUrl(data.preview_url + "?t=" + Date.now());
-      }
-    };
+    const fileUrl = uploadData.file_url;
 
-    reader.readAsArrayBuffer(file);
+    // 3. ask backend for preview
+    const res2 = await fetch(`${API}/watermark/preview`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        pdfUrl: fileUrl, // now a real URL
+        options: opts,
+      }),
+    });
+
+    const data = await res2.json();
+
+    if (data.preview_url) {
+      setPreviewUrl(data.preview_url + "?t=" + Date.now());
+    }
   }
 
   useEffect(() => {
