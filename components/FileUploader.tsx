@@ -12,8 +12,9 @@ import {
 import ProcessingStatus from "./ProcessingStatus";
 
 interface FileUploaderProps {
-  options: object;
   tool: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  options?: Record<string, any>; // <- optional now
 }
 
 export default function FileUploader({ tool }: FileUploaderProps) {
