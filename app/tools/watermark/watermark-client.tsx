@@ -14,8 +14,10 @@ export default function WatermarkClient() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [options, setOptions] = useState<any>({});
 
+  // ----------------------------
+  // Generate Preview
+  // ----------------------------
   async function generatePreview(file: File, opts: any) {
-    // 1. request signed URL
     const res1 = await fetch(`${API}/upload/create-url`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -28,7 +30,7 @@ export default function WatermarkClient() {
 
     const uploadData = await res1.json();
 
-    // 2. upload file to the signed URL
+    // upload PDF to S3
     await fetch(uploadData.url, {
       method: "PUT",
       body: file,
@@ -36,12 +38,12 @@ export default function WatermarkClient() {
 
     const fileUrl = uploadData.file_url;
 
-    // 3. ask backend for preview
+    // request preview
     const res2 = await fetch(`${API}/watermark/preview`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        pdfUrl: fileUrl, // now a real URL
+        pdfUrl: fileUrl,
         options: opts,
       }),
     });
@@ -53,6 +55,9 @@ export default function WatermarkClient() {
     }
   }
 
+  // ----------------------------
+  // Listen for file from ToolPage
+  // ----------------------------
   useEffect(() => {
     const handler = (e: any) => {
       const file = e.detail;
@@ -64,12 +69,14 @@ export default function WatermarkClient() {
 
     window.addEventListener("pdf-selected", handler);
     return () => window.removeEventListener("pdf-selected", handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [options]);
+  }, []); // <-- FIXED
 
+  // ----------------------------
+  // UI
+  // ----------------------------
   return (
     <div className="mt-6 space-y-6">
-      {/* controls */}
+      {/* Watermark Controls */}
       <WatermarkControls
         onChange={(opts: any) => {
           setOptions(opts);
@@ -80,17 +87,17 @@ export default function WatermarkClient() {
         }}
       />
 
-      {/* listen for file from ToolPage */}
+      {/* Hidden local input (direct select alternative) */}
       <input
         id="fileInput"
         type="file"
         hidden
         onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (!f) return;
+          const file = e.target.files?.[0];
+          if (!file) return;
 
-          setSelectedFile(f);
-          generatePreview(f, options);
+          setSelectedFile(file);
+          generatePreview(file, options);
         }}
       />
 

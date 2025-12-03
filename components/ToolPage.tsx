@@ -158,13 +158,12 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
             className="hidden"
             id="fileInput"
             onChange={(e) => {
-              const arr = Array.from(e.target.files || []);
-              setFiles(arr);
+              const filesArr = Array.from(e.target.files || []);
+              setFiles(filesArr);
 
-              const file = e.target.files?.[0];
-              if (file) {
+              if (filesArr[0]) {
                 window.dispatchEvent(
-                  new CustomEvent("pdf-selected", { detail: file })
+                  new CustomEvent("pdf-selected", { detail: filesArr[0] })
                 );
               }
             }}
@@ -273,8 +272,7 @@ function StatusIndicator({
   text,
   color = "text-blue-600",
   spin = false,
-}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-any) {
+}: any) {
   return (
     <div className="flex flex-col items-center gap-3">
       <FontAwesomeIcon
