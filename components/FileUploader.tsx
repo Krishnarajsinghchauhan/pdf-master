@@ -248,6 +248,10 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     multiple: maxFiles > 1,
+    accept: allowedTypes[tool]?.reduce((acc, type) => {
+      acc[type] = [];
+      return acc;
+    }, {} as Record<string, string[]>),
   });
 
   // ------------------------------
