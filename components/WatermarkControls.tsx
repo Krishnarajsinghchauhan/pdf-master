@@ -1,10 +1,30 @@
 "use client";
 import { useState } from "react";
 
-export default function WatermarkControls({ onChange }) {
+type WatermarkValues = {
+  type: string;
+  text: string;
+  imageUrl: string;
+  opacity: string;
+  fontSize: string;
+  color: string;
+  angle: string;
+  position: string;
+  scale: string;
+  repeat: string;
+};
+
+interface WatermarkControlsProps {
+  onChange: (values: WatermarkValues) => void;
+}
+
+export default function WatermarkControls({
+  onChange,
+}: WatermarkControlsProps) {
   const [type, setType] = useState("text");
 
-  const update = (key, value) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const update = (key: any, value: any) => {
     const newState = { ...values, [key]: value };
     setValues(newState);
     onChange(newState);
@@ -69,8 +89,9 @@ export default function WatermarkControls({ onChange }) {
             accept="image/*"
             className="w-full"
             onChange={async (e) => {
-              const file = e.target.files[0];
-              if (!file) return;
+              const files = e.target.files;
+              if (!files || files.length === 0) return;
+              const file = files[0];
 
               // Convert to base64
               const reader = new FileReader();
