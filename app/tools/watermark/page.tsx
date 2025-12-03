@@ -1,5 +1,4 @@
 import AdsterraNative from "@/app/ads/AdsterraNative";
-import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
 import ToolSEO from "@/components/ToolSEO";
 import WatermarkClient from "./watermark-client";
@@ -24,7 +23,6 @@ export default function Watermark() {
         <AdsterraNative />
       </div>
       <ToolPage title="Add Watermark" tool="watermark">
-        <FileUploader tool="watermark" options={{}} />
         <WatermarkClient /> {/* ← MOVE CLIENT LOGIC HERE */}
         <ToolSEO
           title="Add Watermark to PDF"
