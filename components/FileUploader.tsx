@@ -15,6 +15,8 @@ interface FileUploaderProps {
   tool: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options?: Record<string, any>; // <- optional now
+  onFileSelected?: (file: File | null) => void;
+  onJobCreated?: (jobId: string) => void;
 }
 
 export default function FileUploader({ tool }: FileUploaderProps) {
