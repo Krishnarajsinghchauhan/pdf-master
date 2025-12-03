@@ -17,6 +17,7 @@ import {
 import AdsterraNative from "./ads/AdsterraNative";
 
 const tools = [
+  // CORE PDF
   {
     name: "Merge PDF",
     path: "/tools/merge",
@@ -54,6 +55,7 @@ const tools = [
     color: "from-red-500 to-orange-500",
   },
 
+  // OFFICE CONVERSIONS
   {
     name: "PDF to Word",
     path: "/tools/pdf-to-word",
@@ -66,7 +68,6 @@ const tools = [
     icon: faFileWord,
     color: "from-indigo-500 to-blue-600",
   },
-
   {
     name: "PDF to Excel",
     path: "/tools/pdf-to-excel",
@@ -79,7 +80,20 @@ const tools = [
     icon: faFileExcel,
     color: "from-emerald-500 to-green-600",
   },
+  {
+    name: "PDF to PowerPoint",
+    path: "/tools/pdf-to-ppt",
+    icon: faFilePdf,
+    color: "from-purple-600 to-fuchsia-600",
+  },
+  {
+    name: "PowerPoint to PDF",
+    path: "/tools/ppt-to-pdf",
+    icon: faFilePdf,
+    color: "from-fuchsia-600 to-purple-600",
+  },
 
+  // IMAGE <-> PDF
   {
     name: "PDF to JPG",
     path: "/tools/pdf-to-jpg",
@@ -92,7 +106,46 @@ const tools = [
     icon: faImages,
     color: "from-orange-400 to-orange-600",
   },
+  {
+    name: "PDF to PNG",
+    path: "/tools/pdf-to-png",
+    icon: faImages,
+    color: "from-green-400 to-green-700",
+  },
+  {
+    name: "PNG to PDF",
+    path: "/tools/png-to-pdf",
+    icon: faImages,
+    color: "from-teal-400 to-teal-700",
+  },
 
+  // PDF EDITING
+  {
+    name: "Edit PDF",
+    path: "/tools/edit",
+    icon: faWrench,
+    color: "from-indigo-500 to-indigo-800",
+  },
+  {
+    name: "Add Watermark",
+    path: "/tools/watermark",
+    icon: faWrench,
+    color: "from-blue-500 to-cyan-600",
+  },
+  {
+    name: "Add Page Numbers",
+    path: "/tools/page-numbers",
+    icon: faWrench,
+    color: "from-amber-500 to-orange-600",
+  },
+  {
+    name: "Header & Footer",
+    path: "/tools/header-footer",
+    icon: faWrench,
+    color: "from-gray-500 to-gray-700",
+  },
+
+  // SECURITY
   {
     name: "Protect PDF",
     path: "/tools/protect",
@@ -106,6 +159,27 @@ const tools = [
     color: "from-slate-600 to-gray-900",
   },
 
+  // OCR / AI
+  {
+    name: "OCR PDF",
+    path: "/tools/ocr",
+    icon: faFilePdf,
+    color: "from-lime-500 to-green-700",
+  },
+  {
+    name: "Image to Text",
+    path: "/tools/image-to-text",
+    icon: faImages,
+    color: "from-lime-600 to-emerald-700",
+  },
+  {
+    name: "Enhance Scan",
+    path: "/tools/scanned-enhance",
+    icon: faFilePdf,
+    color: "from-yellow-600 to-red-600",
+  },
+
+  // eSIGN & FORMS
   {
     name: "eSign PDF",
     path: "/tools/esign",
@@ -113,10 +187,18 @@ const tools = [
     color: "from-teal-500 to-cyan-600",
   },
   {
-    name: "Create Forms",
+    name: "Fillable Forms",
     path: "/tools/fillable-forms",
     icon: faCogs,
     color: "from-violet-500 to-purple-600",
+  },
+
+  // SMART COMBINE
+  {
+    name: "Smart Combine",
+    path: "/tools/combine",
+    icon: faFilePdf,
+    color: "from-rose-500 to-pink-600",
   },
 ];
 
