@@ -139,7 +139,6 @@ export default function ToolPage({ tool, title }: ToolPageProps) {
             multiple={tool !== "reorder"}
             className="hidden"
             id="fileInput"
-            accept="application/pdf"
             onChange={(e) => setFiles(Array.from(e.target.files || []))}
           />
 
