@@ -2,6 +2,8 @@ import AdsterraNative from "@/app/ads/AdsterraNative";
 import FileUploader from "@/components/FileUploader";
 import ToolPage from "@/components/ToolPage";
 import ToolSEO from "@/components/ToolSEO";
+import WatermarkControls from "@/components/WatermarkControls";
+import { useState } from "react";
 
 export const metadata = {
   title: "Add Watermark to PDF — Text & Image Watermarks | PixelPDF",
@@ -17,12 +19,14 @@ export const metadata = {
 };
 
 export default function Watermark() {
+  const [options, setOptions] = useState({});
   return (
     <>
       <div className="flex justify-center mb-6">
         <AdsterraNative />
       </div>
       <ToolPage title="Add Watermark" tool="watermark">
+        <WatermarkControls onChange={setOptions} />
         <FileUploader tool="watermark" />
 
         <ToolSEO
