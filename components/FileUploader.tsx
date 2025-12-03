@@ -34,6 +34,8 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     "delete-pages": ["application/pdf"],
     protect: ["application/pdf"],
     unlock: ["application/pdf"],
+
+    // Office conversions
     "pdf-to-word": ["application/pdf"],
     "pdf-to-excel": ["application/pdf"],
     "pdf-to-ppt": ["application/pdf"],
@@ -49,27 +51,80 @@ export default function FileUploader({ tool }: FileUploaderProps) {
       "application/vnd.ms-powerpoint",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ],
-    "jpg-to-pdf": ["image/jpeg"],
+
+    // PDF <-> Image
+    "jpg-to-pdf": [
+      "image/jpeg",
+      "image/jpg",
+      "image/pjpeg",
+      "image/pjpg",
+      "image/jfif",
+      "image/heic",
+      "image/heif",
+      "image/hevc",
+    ],
     "pdf-to-jpg": ["application/pdf"],
-    "png-to-pdf": ["image/png"],
+
+    "png-to-pdf": [
+      "image/png",
+      "image/x-png",
+      "image/heic",
+      "image/heif",
+      "image/hevc",
+    ],
     "pdf-to-png": ["application/pdf"],
+
+    // Editing
     edit: ["application/pdf"],
     watermark: ["application/pdf"],
     "page-numbers": ["application/pdf"],
     "header-footer": ["application/pdf"],
+
+    // OCR
     ocr: ["application/pdf"],
-    "image-to-text": ["image/jpeg", "image/png"],
+    "image-to-text": [
+      "image/jpeg",
+      "image/jpg",
+      "image/pjpeg",
+      "image/pjpg",
+      "image/jfif",
+      "image/png",
+      "image/x-png",
+      "image/heic",
+      "image/heif",
+      "image/hevc",
+    ],
     "scanned-enhance": ["application/pdf"],
+
+    // eSign & Forms
     esign: ["application/pdf"],
     "fillable-forms": ["application/pdf"],
+
+    // Combine supports EVERYTHING
     combine: [
       "application/pdf",
+
+      // Images
       "image/jpeg",
+      "image/jpg",
+      "image/pjpeg",
+      "image/pjpg",
+      "image/jfif",
       "image/png",
+      "image/x-png",
+      "image/heic",
+      "image/heif",
+      "image/hevc",
+
+      // Word
       "application/msword",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+      // Excel
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+
+      // PowerPoint
       "application/vnd.ms-powerpoint",
       "application/vnd.openxmlformats-officedocument.presentationml.presentation",
     ],
