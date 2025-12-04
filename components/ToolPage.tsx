@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,6 +24,7 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
   const [status, setStatus] = useState("idle");
   const [downloadUrl, setDownloadUrl] = useState<string[]>([]);
   const [pageOrder, setPageOrder] = useState<string>("");
+  const [headerFooterOptions, setHeaderFooterOptions] = useState({});
 
   const API = process.env.NEXT_PUBLIC_API_URL;
 
@@ -88,7 +89,12 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
       body: JSON.stringify({
         tool,
         files: uploaded,
-        options: tool === "reorder" ? { order: pageOrder } : {},
+        options:
+          tool === "header-footer"
+            ? headerFooterOptions
+            : tool === "reorder"
+            ? { order: pageOrder }
+            : {},
       }),
     });
 
@@ -130,6 +136,15 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
       }
     }, 1500);
   }
+
+  useEffect(() => {
+    window.addEventListener("header-footer-options", (e: any) => {
+      console.log("🔥 Received options from HeaderFooterClient:", e.detail);
+      setHeaderFooterOptions(e.detail);
+    });
+
+    return () => window.removeEventListener("header-footer-options", () => {});
+  }, []);
 
   // ----------------------------
   // Main UI

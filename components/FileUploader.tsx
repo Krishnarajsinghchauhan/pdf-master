@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useCallback, useState } from "react";
@@ -241,7 +242,14 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     const jobRes = await fetch("http://localhost:8080/job/create", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tool, files: uploadedURLs, options: {} }),
+      body: JSON.stringify({
+        tool,
+        files: uploadedURLs,
+        options:
+          tool === "header-footer"
+            ? (window as any).headerFooterOptions || {}
+            : {},
+      }),
     });
 
     const jobData = await jobRes.json();

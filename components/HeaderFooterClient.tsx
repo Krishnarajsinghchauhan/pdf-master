@@ -26,6 +26,12 @@ export default function HeaderFooterClient() {
     return () => window.removeEventListener("pdf-selected", handler);
   }, []);
 
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("header-footer-options", { detail: options })
+    );
+  }, [options]);
+
   // ✨ PROCESS PDF BUTTON
   async function startProcessing() {
     if (!file) return alert("Upload a PDF first!");
