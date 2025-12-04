@@ -1,5 +1,6 @@
 import AdsterraNative from "@/app/ads/AdsterraNative";
-import FileUploader from "@/components/FileUploader";
+
+import HeaderFooterClient from "@/components/HeaderFooterClient";
 import ToolPage from "@/components/ToolPage";
 import ToolSEO from "@/components/ToolSEO";
 
@@ -24,7 +25,7 @@ export default function HeaderFooter() {
         <AdsterraNative />
       </div>
       <ToolPage title="Header & Footer Editor" tool="header-footer">
-        <FileUploader tool="header-footer" />
+        <HeaderFooterClient />
 
         <ToolSEO
           title="Add Header & Footer to PDF"
