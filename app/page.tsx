@@ -120,12 +120,7 @@ const tools = [
   },
 
   // PDF EDITING
-  {
-    name: "Edit PDF",
-    path: "/tools/edit",
-    icon: faWrench,
-    color: "from-indigo-500 to-indigo-800",
-  },
+
   {
     name: "Add Watermark",
     path: "/tools/watermark",
@@ -194,12 +189,6 @@ const tools = [
   },
 
   // SMART COMBINE
-  {
-    name: "Smart Combine",
-    path: "/tools/combine",
-    icon: faFilePdf,
-    color: "from-rose-500 to-pink-600",
-  },
 ];
 
 export default function Home() {
