@@ -2,9 +2,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import * as pdfjsLib from "pdfjs-dist";
+import { GlobalWorkerOptions, getDocument } from "pdfjs-dist/legacy/build/pdf";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js`;
+GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js`;
 
 export default function HeaderFooterPreview({ pdfUrl, options }: any) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -13,7 +13,7 @@ export default function HeaderFooterPreview({ pdfUrl, options }: any) {
     if (!pdfUrl) return;
 
     async function render() {
-      const pdf = await pdfjsLib.getDocument(pdfUrl).promise;
+      const pdf = await getDocument(pdfUrl).promise;
       const page = await pdf.getPage(1);
 
       const viewport = page.getViewport({ scale: 1.5 });
@@ -23,31 +23,26 @@ export default function HeaderFooterPreview({ pdfUrl, options }: any) {
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
-      // Render base PDF
       await page.render({ canvasContext: ctx, viewport }).promise;
 
-      // Draw header
+      // HEADER
       ctx.font = `${options.fontSize}px Arial`;
       ctx.fillStyle = options.color;
       ctx.textAlign = options.align;
-      ctx.fillText(
-        options.header,
+
+      const headerX =
         options.align === "left"
           ? 50
           : options.align === "right"
           ? canvas.width - 50
-          : canvas.width / 2,
-        options.marginTop
-      );
+          : canvas.width / 2;
 
-      // Draw footer
+      ctx.fillText(options.header, headerX, options.marginTop);
+
+      // FOOTER
       ctx.fillText(
         options.footer,
-        options.align === "left"
-          ? 50
-          : options.align === "right"
-          ? canvas.width - 50
-          : canvas.width / 2,
+        headerX,
         canvas.height - options.marginBottom
       );
     }
