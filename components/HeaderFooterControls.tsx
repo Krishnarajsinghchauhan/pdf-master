@@ -14,8 +14,9 @@ export default function HeaderFooterControls({ onChange }: any) {
     marginBottom: 40,
   });
 
-  // 🔥 ALWAYS sync parent with newest values
+  // 🔥 Push updated values to parent every time ANY setting changes
   useEffect(() => {
+    console.log("🔥 Controls -> sending updated values:", values);
     onChange(values);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [values]);
@@ -51,7 +52,6 @@ export default function HeaderFooterControls({ onChange }: any) {
         max="80"
         value={values.fontSize}
         onChange={(e) => update("fontSize", Number(e.target.value))}
-        className="w-full mb-2"
       />
 
       <label>Color</label>
@@ -59,13 +59,11 @@ export default function HeaderFooterControls({ onChange }: any) {
         type="color"
         value={values.color}
         onChange={(e) => update("color", e.target.value)}
-        className="mb-2 block"
       />
 
       <label>Alignment</label>
       <select
         value={values.align}
-        className="border p-2 mb-3 w-full"
         onChange={(e) => update("align", e.target.value)}
       >
         <option value="center">Center</option>
@@ -80,7 +78,6 @@ export default function HeaderFooterControls({ onChange }: any) {
         max="200"
         value={values.marginTop}
         onChange={(e) => update("marginTop", Number(e.target.value))}
-        className="w-full mb-2"
       />
 
       <label>Bottom Margin ({values.marginBottom}px)</label>
@@ -90,7 +87,6 @@ export default function HeaderFooterControls({ onChange }: any) {
         max="200"
         value={values.marginBottom}
         onChange={(e) => update("marginBottom", Number(e.target.value))}
-        className="w-full"
       />
     </div>
   );
