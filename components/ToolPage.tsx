@@ -28,9 +28,6 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
 
   const API = process.env.NEXT_PUBLIC_API_URL;
 
-  // ----------------------------
-  // Upload to S3
-  // ----------------------------
   async function uploadToS3(file: File) {
     const event = new CustomEvent("watermark-options-request");
     window.dispatchEvent(event);
@@ -138,12 +135,20 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
   }
 
   useEffect(() => {
-    window.addEventListener("header-footer-options", (e: any) => {
-      console.log("🔥 Received options from HeaderFooterClient:", e.detail);
-      setHeaderFooterOptions(e.detail);
-    });
+    function handler(e: any) {
+      setHeaderFooterOptions({
+        header: e.detail.header || "",
+        footer: e.detail.footer || "",
+        fontSize: String(e.detail.fontSize || "28"),
+        color: e.detail.color || "#000000",
+        align: e.detail.align || "center",
+        marginTop: String(e.detail.marginTop || "40"),
+        marginBottom: String(e.detail.marginBottom || "40"),
+      });
+    }
 
-    return () => window.removeEventListener("header-footer-options", () => {});
+    window.addEventListener("header-footer-options", handler);
+    return () => window.removeEventListener("header-footer-options", handler);
   }, []);
 
   // ----------------------------

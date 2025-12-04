@@ -14,16 +14,9 @@ export default function HeaderFooterControls({ onChange }: any) {
     marginBottom: 40,
   });
 
-  // 🔥 Push updated values to parent every time ANY setting changes
   useEffect(() => {
-    console.log("🔥 Controls -> sending updated values:", values);
     onChange(values);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [values]);
-
-  function update(key: string, value: any) {
-    setValues((prev) => ({ ...prev, [key]: value }));
-  }
+  }, [values, onChange]);
 
   return (
     <div className="bg-white border rounded p-4 shadow">
@@ -34,7 +27,7 @@ export default function HeaderFooterControls({ onChange }: any) {
         className="w-full border p-2 mb-2"
         rows={2}
         value={values.header}
-        onChange={(e) => update("header", e.target.value)}
+        onChange={(e) => setValues({ ...values, header: e.target.value })}
       />
 
       <label>Footer</label>
@@ -42,7 +35,7 @@ export default function HeaderFooterControls({ onChange }: any) {
         className="w-full border p-2 mb-2"
         rows={2}
         value={values.footer}
-        onChange={(e) => update("footer", e.target.value)}
+        onChange={(e) => setValues({ ...values, footer: e.target.value })}
       />
 
       <label>Font Size ({values.fontSize}px)</label>
@@ -51,20 +44,22 @@ export default function HeaderFooterControls({ onChange }: any) {
         min="16"
         max="80"
         value={values.fontSize}
-        onChange={(e) => update("fontSize", Number(e.target.value))}
+        onChange={(e) =>
+          setValues({ ...values, fontSize: Number(e.target.value) })
+        }
       />
 
       <label>Color</label>
       <input
         type="color"
         value={values.color}
-        onChange={(e) => update("color", e.target.value)}
+        onChange={(e) => setValues({ ...values, color: e.target.value })}
       />
 
       <label>Alignment</label>
       <select
         value={values.align}
-        onChange={(e) => update("align", e.target.value)}
+        onChange={(e) => setValues({ ...values, align: e.target.value })}
       >
         <option value="center">Center</option>
         <option value="left">Left</option>
@@ -77,7 +72,9 @@ export default function HeaderFooterControls({ onChange }: any) {
         min="10"
         max="200"
         value={values.marginTop}
-        onChange={(e) => update("marginTop", Number(e.target.value))}
+        onChange={(e) =>
+          setValues({ ...values, marginTop: Number(e.target.value) })
+        }
       />
 
       <label>Bottom Margin ({values.marginBottom}px)</label>
@@ -86,7 +83,9 @@ export default function HeaderFooterControls({ onChange }: any) {
         min="10"
         max="200"
         value={values.marginBottom}
-        onChange={(e) => update("marginBottom", Number(e.target.value))}
+        onChange={(e) =>
+          setValues({ ...values, marginBottom: Number(e.target.value) })
+        }
       />
     </div>
   );
