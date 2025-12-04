@@ -1,55 +1,41 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useRef } from "react";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf";
+import "pdfjs-dist/legacy/build/pdf.worker";
 
-// ✔ Browser-only version (no canvas)
-import * as pdfjsLib from "pdfjs-dist/webpack";
+// Use CDN worker
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js`;
-
-export default function HeaderFooterPreview({ pdfUrl, options }: any) {
+export default function HeaderFooterPreview({ url }: { url: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (!pdfUrl) return;
+    if (!url || !canvasRef.current) return;
 
-    async function render() {
-      const loadingTask = pdfjsLib.getDocument(pdfUrl);
-      const pdf = await loadingTask.promise;
+    const load = async () => {
+      const pdf = await pdfjsLib.getDocument(url).promise;
       const page = await pdf.getPage(1);
 
-      const viewport = page.getViewport({ scale: 1.5 });
+      const viewport = page.getViewport({ scale: 1.2 });
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
 
-      const canvas = canvasRef.current!;
-      const ctx = canvas.getContext("2d")!;
-
-      canvas.width = viewport.width;
       canvas.height = viewport.height;
+      canvas.width = viewport.width;
 
-      // render page
       await page.render({ canvasContext: ctx, viewport }).promise;
+    };
 
-      // draw header/footer
-      ctx.font = `${options.fontSize}px Arial`;
-      ctx.fillStyle = options.color;
-      ctx.textAlign = "center";
-
-      ctx.fillText(options.header, canvas.width / 2, Number(options.marginTop));
-      ctx.fillText(
-        options.footer,
-        canvas.width / 2,
-        canvas.height - Number(options.marginBottom)
-      );
-    }
-
-    render();
-  }, [pdfUrl, options]);
+    load();
+  }, [url]);
 
   return (
-    <div className="border rounded p-4 bg-white shadow mt-4">
-      <h3 className="font-semibold mb-2">Preview</h3>
-      <canvas ref={canvasRef} className="w-full rounded" />
+    <div className="border p-3 bg-white rounded shadow">
+      <canvas ref={canvasRef} className="w-full"></canvas>
     </div>
   );
 }

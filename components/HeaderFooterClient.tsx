@@ -28,7 +28,7 @@ export default function HeaderFooterClient() {
     <div className="space-y-6 mt-6">
       <HeaderFooterControls onChange={setOptions} />
 
-      {pdfUrl && <HeaderFooterPreview pdfUrl={pdfUrl} options={options} />}
+      {pdfUrl && <HeaderFooterPreview url={pdfUrl} />}
     </div>
   );
 }
