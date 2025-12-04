@@ -3,7 +3,11 @@
 
 import { useState, useEffect } from "react";
 import HeaderFooterControls from "./HeaderFooterControls";
-import HeaderFooterPreview from "./HeaderFooterPreview";
+import dynamic from "next/dynamic";
+const HeaderFooterPreview = dynamic(
+  () => import("@/components/HeaderFooterPreview"),
+  { ssr: false }
+);
 
 export default function HeaderFooterClient() {
   const [file, setFile] = useState<File | null>(null);
