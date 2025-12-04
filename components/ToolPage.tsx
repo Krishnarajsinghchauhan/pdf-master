@@ -17,9 +17,22 @@ type ToolPageProps = {
   tool: string;
   children?: React.ReactNode;
   title: string;
+
+  // 🆕 For eSign
+  onFileSelected?: (file: File | null) => void;
+  esignData?: {
+    signature: string;
+    position: { x: number; y: number };
+  };
 };
 
-export default function ToolPage({ tool, title, children }: ToolPageProps) {
+export default function ToolPage({
+  tool,
+  title,
+  children,
+  onFileSelected,
+  esignData,
+}: ToolPageProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [status, setStatus] = useState("idle");
   const [downloadUrl, setDownloadUrl] = useState<string[]>([]);
@@ -87,7 +100,9 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
         tool,
         files: uploaded,
         options:
-          tool === "header-footer"
+          tool === "esign"
+            ? esignData
+            : tool === "header-footer"
             ? headerFooterOptions
             : tool === "reorder"
             ? { order: pageOrder }
@@ -181,10 +196,8 @@ export default function ToolPage({ tool, title, children }: ToolPageProps) {
               const filesArr = Array.from(e.target.files || []);
               setFiles(filesArr);
 
-              if (filesArr[0]) {
-                window.dispatchEvent(
-                  new CustomEvent("pdf-selected", { detail: filesArr[0] })
-                );
+              if (filesArr[0] && onFileSelected) {
+                onFileSelected(filesArr[0]);
               }
             }}
           />
