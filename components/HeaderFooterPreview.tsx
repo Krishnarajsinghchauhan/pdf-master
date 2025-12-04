@@ -2,9 +2,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GlobalWorkerOptions, getDocument } from "pdfjs-dist/legacy/build/pdf";
 
-GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js`;
+// ✔ Browser-only version (no canvas)
+import * as pdfjsLib from "pdfjs-dist/webpack";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js`;
 
 export default function HeaderFooterPreview({ pdfUrl, options }: any) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -13,37 +15,31 @@ export default function HeaderFooterPreview({ pdfUrl, options }: any) {
     if (!pdfUrl) return;
 
     async function render() {
-      const pdf = await getDocument(pdfUrl).promise;
+      const loadingTask = pdfjsLib.getDocument(pdfUrl);
+      const pdf = await loadingTask.promise;
       const page = await pdf.getPage(1);
 
       const viewport = page.getViewport({ scale: 1.5 });
+
       const canvas = canvasRef.current!;
       const ctx = canvas.getContext("2d")!;
 
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
+      // render page
       await page.render({ canvasContext: ctx, viewport }).promise;
 
-      // HEADER
+      // draw header/footer
       ctx.font = `${options.fontSize}px Arial`;
       ctx.fillStyle = options.color;
-      ctx.textAlign = options.align;
+      ctx.textAlign = "center";
 
-      const headerX =
-        options.align === "left"
-          ? 50
-          : options.align === "right"
-          ? canvas.width - 50
-          : canvas.width / 2;
-
-      ctx.fillText(options.header, headerX, options.marginTop);
-
-      // FOOTER
+      ctx.fillText(options.header, canvas.width / 2, Number(options.marginTop));
       ctx.fillText(
         options.footer,
-        headerX,
-        canvas.height - options.marginBottom
+        canvas.width / 2,
+        canvas.height - Number(options.marginBottom)
       );
     }
 
@@ -51,8 +47,8 @@ export default function HeaderFooterPreview({ pdfUrl, options }: any) {
   }, [pdfUrl, options]);
 
   return (
-    <div className="border rounded p-4 bg-white shadow">
-      <h3 className="font-semibold mb-2">Live Preview</h3>
+    <div className="border rounded p-4 bg-white shadow mt-4">
+      <h3 className="font-semibold mb-2">Preview</h3>
       <canvas ref={canvasRef} className="w-full rounded" />
     </div>
   );
