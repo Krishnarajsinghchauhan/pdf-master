@@ -21,8 +21,15 @@ type ToolPageProps = {
   // 🆕 For eSign
   onFileSelected?: (file: File | null) => void;
   esignData?: {
-    signature: string;
-    position: { x: number; y: number };
+    signatures: {
+      id: number;
+      image: string;
+      x: number;
+      y: number;
+      size: number;
+      rotation: number;
+      type: string;
+    }[];
   };
 };
 

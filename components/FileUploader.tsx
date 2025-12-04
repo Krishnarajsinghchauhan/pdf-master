@@ -354,8 +354,10 @@ export default function FileUploader({ tool }: FileUploaderProps) {
         {files.length > 0 && signature !== "" && (
           <PDFPreviewWithSignature
             file={files[0]}
-            signature={signature}
-            onPositionChange={(pos) => setPosition(pos)}
+            signatures={signature}
+            onPositionChange={(pos: { x: number; y: number }) =>
+              setPosition(pos)
+            }
           />
         )}
 

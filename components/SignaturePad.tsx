@@ -1,42 +1,65 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import SignatureCanvas from "react-signature-canvas";
+import { useRef, useState } from "react";
 
 export default function SignaturePad({
   onComplete,
 }: {
   onComplete: (dataUrl: string) => void;
 }) {
-  const sigRef = useRef<SignatureCanvas>(null);
-  const [color, setColor] = useState("#000000");
-  const [penSize, setPenSize] = useState(2);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [drawing, setDrawing] = useState(false);
+  const [penColor, setPenColor] = useState("#000000");
+  const [penSize, setPenSize] = useState(3);
 
-  const clear = () => {
-    sigRef.current?.clear();
-    onComplete("");
+  const start = (e: any) => {
+    setDrawing(true);
+    draw(e);
   };
 
-  const save = () => {
-    if (!sigRef.current) return;
-    const dataUrl = sigRef.current.getTrimmedCanvas().toDataURL("image/png");
-    onComplete(dataUrl);
+  const end = () => {
+    setDrawing(false);
+    const url = canvasRef.current!.toDataURL("image/png");
+    onComplete(url);
+  };
+
+  const draw = (e: any) => {
+    if (!drawing) return;
+
+    const canvas = canvasRef.current!;
+    const ctx = canvas.getContext("2d")!;
+    const rect = canvas.getBoundingClientRect();
+
+    ctx.lineWidth = penSize;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = penColor;
+
+    ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+  };
+
+  const clear = () => {
+    const canvas = canvasRef.current!;
+    canvas.getContext("2d")!.clearRect(0, 0, canvas.width, canvas.height);
+    onComplete("");
   };
 
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold">Draw Your Signature</h3>
+      <h3 className="font-semibold">Draw Your Signature</h3>
 
-      {/* Controls */}
-      <div className="flex items-center gap-3">
-        <label className="text-sm">Color:</label>
+      <div className="flex gap-3">
+        <label>Color:</label>
         <input
           type="color"
-          value={color}
-          onChange={(e) => setColor(e.target.value)}
+          value={penColor}
+          onChange={(e) => setPenColor(e.target.value)}
         />
 
-        <label className="text-sm ml-4">Size:</label>
+        <label>Size:</label>
         <input
           type="range"
           min="1"
@@ -46,36 +69,22 @@ export default function SignaturePad({
         />
       </div>
 
-      {/* Signature board */}
-      <SignatureCanvas
-        ref={sigRef}
-        penColor={color}
-        minWidth={penSize}
-        maxWidth={penSize}
-        canvasProps={{
-          width: 500,
-          height: 200,
-          className: "border rounded bg-white shadow",
-        }}
-        onEnd={save}
+      <canvas
+        ref={canvasRef}
+        width={500}
+        height={200}
+        className="border rounded bg-white shadow"
+        onMouseDown={start}
+        onMouseUp={end}
+        onMouseMove={draw}
       />
 
-      {/* Buttons */}
-      <div className="flex gap-3">
-        <button
-          onClick={clear}
-          className="px-4 py-2 bg-red-600 text-white rounded"
-        >
-          Clear
-        </button>
-
-        <button
-          onClick={save}
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          Save Signature
-        </button>
-      </div>
+      <button
+        className="px-4 py-2 bg-red-600 text-white rounded"
+        onClick={clear}
+      >
+        Clear
+      </button>
     </div>
   );
 }
