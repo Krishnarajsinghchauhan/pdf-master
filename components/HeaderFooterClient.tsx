@@ -20,24 +20,22 @@ export default function HeaderFooterClient() {
       if (!f) return;
 
       setFile(f);
-      const blobUrl = URL.createObjectURL(f);
-      setFileUrl(blobUrl);
+      setFileUrl(URL.createObjectURL(f));
     };
-
     window.addEventListener("pdf-selected", handler);
     return () => window.removeEventListener("pdf-selected", handler);
   }, []);
 
+  // ✨ PROCESS PDF BUTTON
   async function startProcessing() {
-    if (!file) {
-      alert("Please upload a PDF.");
-      return;
-    }
+    if (!file) return alert("Upload a PDF first!");
+
+    console.log("🔵 Sending header/footer options to backend:", options);
 
     setProcessing(true);
     setResultUrl(null);
 
-    // 1. Ask backend for upload URL
+    // 1. Create upload URL
     const req1 = await fetch(`${API}/upload/create-url`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -46,13 +44,10 @@ export default function HeaderFooterClient() {
 
     const upload = await req1.json();
 
-    // 2. Upload original file to S3
-    await fetch(upload.url, {
-      method: "PUT",
-      body: file,
-    });
+    // 2. Upload original PDF
+    await fetch(upload.url, { method: "PUT", body: file });
 
-    // 3. Send job to queue
+    // 3. Create job
     const req2 = await fetch(`${API}/job/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -60,13 +55,13 @@ export default function HeaderFooterClient() {
         tool: "header-footer",
         files: [upload.file_url],
         options: {
-          header: options.header || "",
-          footer: options.footer || "",
-          fontSize: String(options.fontSize || "28"),
-          color: options.color || "#000000",
-          align: options.align || "center",
-          marginTop: String(options.marginTop || "40"),
-          marginBottom: String(options.marginBottom || "40"),
+          header: options.header,
+          footer: options.footer,
+          fontSize: String(options.fontSize),
+          color: options.color,
+          align: options.align,
+          marginTop: String(options.marginTop),
+          marginBottom: String(options.marginBottom),
         },
       }),
     });
@@ -74,24 +69,30 @@ export default function HeaderFooterClient() {
     const job = await req2.json();
     const jobId = job.job_id;
 
-    // 4. Poll job status
+    // 4. Polling
     async function poll() {
       const st = await fetch(`${API}/job/status/${jobId}`).then((r) =>
         r.json()
       );
 
+      console.log("🟡 Worker Status:", st);
+
       if (st.status === "completed") {
         const res = await fetch(`${API}/job/result/${jobId}`).then((r) =>
           r.json()
         );
-        setProcessing(false);
         setResultUrl(res.url);
-      } else if (st.status === "error") {
+        setProcessing(false);
+        return;
+      }
+
+      if (st.status === "error") {
         setProcessing(false);
         alert("Processing failed.");
-      } else {
-        setTimeout(poll, 1500);
+        return;
       }
+
+      setTimeout(poll, 1500);
     }
 
     poll();
@@ -106,8 +107,8 @@ export default function HeaderFooterClient() {
       {fileUrl && (
         <button
           onClick={startProcessing}
-          className="px-5 py-3 bg-blue-600 text-white rounded shadow hover:bg-blue-700"
           disabled={processing}
+          className="px-5 py-3 bg-blue-600 text-white rounded shadow"
         >
           {processing ? "Processing..." : "Start Processing"}
         </button>
@@ -117,7 +118,7 @@ export default function HeaderFooterClient() {
         <a
           href={resultUrl}
           target="_blank"
-          className="block text-center mt-4 text-green-600 font-bold underline"
+          className="block mt-4 text-center text-green-600 font-bold underline"
         >
           Download Edited PDF
         </a>

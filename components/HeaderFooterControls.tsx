@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function HeaderFooterControls({ onChange }: any) {
   const [values, setValues] = useState({
@@ -14,10 +14,14 @@ export default function HeaderFooterControls({ onChange }: any) {
     marginBottom: 40,
   });
 
+  // 🔥 ALWAYS sync parent with newest values
+  useEffect(() => {
+    onChange(values);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
+
   function update(key: string, value: any) {
-    const newObj = { ...values, [key]: value };
-    setValues(newObj);
-    onChange(newObj);
+    setValues((prev) => ({ ...prev, [key]: value }));
   }
 
   return (
@@ -28,6 +32,7 @@ export default function HeaderFooterControls({ onChange }: any) {
       <textarea
         className="w-full border p-2 mb-2"
         rows={2}
+        value={values.header}
         onChange={(e) => update("header", e.target.value)}
       />
 
@@ -35,10 +40,11 @@ export default function HeaderFooterControls({ onChange }: any) {
       <textarea
         className="w-full border p-2 mb-2"
         rows={2}
+        value={values.footer}
         onChange={(e) => update("footer", e.target.value)}
       />
 
-      <label>Font Size</label>
+      <label>Font Size ({values.fontSize}px)</label>
       <input
         type="range"
         min="16"
@@ -67,7 +73,7 @@ export default function HeaderFooterControls({ onChange }: any) {
         <option value="right">Right</option>
       </select>
 
-      <label>Top Margin</label>
+      <label>Top Margin ({values.marginTop}px)</label>
       <input
         type="range"
         min="10"
@@ -77,7 +83,7 @@ export default function HeaderFooterControls({ onChange }: any) {
         className="w-full mb-2"
       />
 
-      <label>Bottom Margin</label>
+      <label>Bottom Margin ({values.marginBottom}px)</label>
       <input
         type="range"
         min="10"
