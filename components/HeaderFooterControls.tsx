@@ -1,35 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 
 export default function HeaderFooterControls({ onChange }: any) {
   const [values, setValues] = useState({
     header: "",
     footer: "",
-    fontSize: "40",
+    fontSize: 28,
     color: "#000000",
     align: "center",
-    marginTop: "80",
-    marginBottom: "80",
+    marginTop: 40,
+    marginBottom: 40,
   });
 
-  const update = (k: string, v: any) => {
-    const obj = { ...values, [k]: v };
-    setValues(obj);
-    onChange(obj);
-    (window as any).headerFooterOptions = obj;
-  };
-
-  useEffect(() => {
-    function handler() {
-      (window as any).headerFooterOptions = values;
-    }
-    window.addEventListener("hf-options-request", handler);
-    return () => window.removeEventListener("hf-options-request", handler);
-  }, [values]);
+  function update(key: string, value: any) {
+    const newObj = { ...values, [key]: value };
+    setValues(newObj);
+    onChange(newObj);
+  }
 
   return (
-    <div className="bg-white border rounded p-4">
+    <div className="bg-white border rounded p-4 shadow">
       <h3 className="font-semibold text-lg mb-4">Header & Footer Settings</h3>
 
       <label>Header Text</label>
@@ -48,52 +40,52 @@ export default function HeaderFooterControls({ onChange }: any) {
         onChange={(e) => update("footer", e.target.value)}
       />
 
-      <label>Font Size</label>
+      <label>Font Size ({values.fontSize}px)</label>
       <input
         type="range"
-        min="20"
-        max="120"
+        min={10}
+        max={100}
         value={values.fontSize}
-        onChange={(e) => update("fontSize", e.target.value)}
+        onChange={(e) => update("fontSize", Number(e.target.value))}
         className="w-full mb-3"
       />
 
       <label>Color</label>
       <input
         type="color"
+        className="mb-3 block"
         value={values.color}
         onChange={(e) => update("color", e.target.value)}
-        className="mb-3 block"
       />
 
-      <label>Alignment</label>
+      <label>Align</label>
       <select
-        value={values.align}
         className="border p-2 rounded w-full mb-3"
+        value={values.align}
         onChange={(e) => update("align", e.target.value)}
       >
-        <option value="north">Top</option>
-        <option value="south">Bottom</option>
+        <option value="left">Left</option>
         <option value="center">Center</option>
+        <option value="right">Right</option>
       </select>
 
-      <label>Top Margin</label>
+      <label>Top Margin ({values.marginTop}px)</label>
       <input
         type="range"
-        min="20"
-        max="300"
+        min={10}
+        max={200}
         value={values.marginTop}
-        onChange={(e) => update("marginTop", e.target.value)}
+        onChange={(e) => update("marginTop", Number(e.target.value))}
         className="w-full mb-3"
       />
 
-      <label>Bottom Margin</label>
+      <label>Bottom Margin ({values.marginBottom}px)</label>
       <input
         type="range"
-        min="20"
-        max="300"
+        min={10}
+        max={200}
         value={values.marginBottom}
-        onChange={(e) => update("marginBottom", e.target.value)}
+        onChange={(e) => update("marginBottom", Number(e.target.value))}
         className="w-full"
       />
     </div>
