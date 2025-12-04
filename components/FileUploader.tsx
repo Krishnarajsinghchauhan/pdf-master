@@ -11,8 +11,13 @@ import {
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import ProcessingStatus from "./ProcessingStatus";
-import SignaturePad from "./SignaturePad";
-import PDFPreviewWithSignature from "./PDFPreviewWithSignature";
+
+import dynamic from "next/dynamic";
+const PDFPreviewWithSignature = dynamic(
+  () => import("./PDFPreviewWithSignature"),
+  { ssr: false }
+);
+const SignaturePad = dynamic(() => import("./SignaturePad"), { ssr: false });
 
 interface FileUploaderProps {
   tool: string;
