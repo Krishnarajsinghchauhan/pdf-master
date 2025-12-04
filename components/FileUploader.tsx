@@ -11,6 +11,8 @@ import {
   faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import ProcessingStatus from "./ProcessingStatus";
+import SignaturePad from "./SignaturePad";
+import PDFPreviewWithSignature from "./PDFPreviewWithSignature";
 
 interface FileUploaderProps {
   tool: string;
@@ -27,6 +29,13 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   >("idle");
 
   const [downloadUrl, setDownloadUrl] = useState<string>("");
+
+  // eSign state
+  const [signature, setSignature] = useState<string>("");
+  const [position, setPosition] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
 
   // FILE TYPES
   const allowedTypes: Record<string, string[]> = {
@@ -269,6 +278,25 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     }, {} as Record<string, string[]>),
   });
 
+  async function applySignature() {
+    if (files.length === 0 || !signature) return;
+
+    const body = new FormData();
+    body.append("file", files[0]);
+    body.append("signature", signature);
+    body.append("x", String(position.x));
+    body.append("y", String(position.y));
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/esign/apply`, {
+      method: "POST",
+      body,
+    });
+
+    const data = await res.json();
+    setDownloadUrl(data.url);
+    setStatus("completed");
+  }
+
   // ------------------------------
   // ⭐ STATUS SCREEN
   // ------------------------------
@@ -296,6 +324,49 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   // ------------------------------
   // ⭐ MAIN PREMIUM UI
   // ------------------------------
+
+  // ⚡ SPECIAL UI FOR eSIGN
+  if (tool === "esign") {
+    return (
+      <div className="mt-6 space-y-6">
+        {/* Upload Section */}
+        <div className="border p-6 rounded-xl bg-white shadow-md">
+          <label className="font-semibold">Upload PDF</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => setFiles(Array.from(e.target.files || []))}
+            className="mt-3"
+          />
+        </div>
+
+        {/* STEP 2 — Signature Pad */}
+        {files.length > 0 && signature === "" && (
+          <SignaturePad onComplete={(sig) => setSignature(sig)} />
+        )}
+
+        {/* STEP 3 — PDF Preview + Drag Signature */}
+        {files.length > 0 && signature !== "" && (
+          <PDFPreviewWithSignature
+            file={files[0]}
+            signature={signature}
+            onPositionChange={(pos) => setPosition(pos)}
+          />
+        )}
+
+        {/* STEP 4 — Apply Signature Button */}
+        {files.length > 0 && signature !== "" && (
+          <button
+            onClick={applySignature}
+            className="w-full py-4 bg-blue-600 text-white rounded-xl font-semibold"
+          >
+            Apply Signature →
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6">
       <motion.div
