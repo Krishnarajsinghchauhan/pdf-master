@@ -24,66 +24,64 @@ export default function HeaderFooterControls({ onChange }: any) {
     <div className="bg-white border rounded p-4 shadow">
       <h3 className="font-semibold text-lg mb-4">Header & Footer Settings</h3>
 
-      <label>Header Text</label>
+      <label>Header</label>
       <textarea
-        className="w-full border p-2 rounded mb-3"
+        className="w-full border p-2 mb-2"
         rows={2}
-        value={values.header}
         onChange={(e) => update("header", e.target.value)}
       />
 
-      <label>Footer Text</label>
+      <label>Footer</label>
       <textarea
-        className="w-full border p-2 rounded mb-3"
+        className="w-full border p-2 mb-2"
         rows={2}
-        value={values.footer}
         onChange={(e) => update("footer", e.target.value)}
       />
 
-      <label>Font Size ({values.fontSize}px)</label>
+      <label>Font Size</label>
       <input
         type="range"
-        min={10}
-        max={100}
+        min="16"
+        max="80"
         value={values.fontSize}
         onChange={(e) => update("fontSize", Number(e.target.value))}
-        className="w-full mb-3"
+        className="w-full mb-2"
       />
 
       <label>Color</label>
       <input
         type="color"
-        className="mb-3 block"
         value={values.color}
         onChange={(e) => update("color", e.target.value)}
+        className="mb-2 block"
       />
 
-      <label>Align</label>
+      <label>Alignment</label>
       <select
-        className="border p-2 rounded w-full mb-3"
         value={values.align}
+        className="border p-2 mb-3 w-full"
         onChange={(e) => update("align", e.target.value)}
       >
-        <option value="left">Left</option>
         <option value="center">Center</option>
+        <option value="left">Left</option>
         <option value="right">Right</option>
       </select>
 
-      <label>Top Margin ({values.marginTop}px)</label>
+      <label>Top Margin</label>
       <input
         type="range"
-        min={10}
-        max={200}
+        min="10"
+        max="200"
         value={values.marginTop}
         onChange={(e) => update("marginTop", Number(e.target.value))}
-        className="w-full mb-3"
+        className="w-full mb-2"
       />
 
-      <label>Bottom Margin ({values.marginBottom}px)</label>
+      <label>Bottom Margin</label>
       <input
         type="range"
-        min={10}
-        max={200}
+        min="10"
+        max="200"
         value={values.marginBottom}
         onChange={(e) => update("marginBottom", Number(e.target.value))}
         className="w-full"

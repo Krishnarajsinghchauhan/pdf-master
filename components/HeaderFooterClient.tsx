@@ -3,15 +3,10 @@
 
 import { useState, useEffect } from "react";
 import HeaderFooterControls from "./HeaderFooterControls";
-import dynamic from "next/dynamic";
-const HeaderFooterPreview = dynamic(
-  () => import("@/components/HeaderFooterPreview"),
-  { ssr: false }
-);
+import HeaderFooterPreview from "./HeaderFooterPreview";
 
 export default function HeaderFooterClient() {
-  const [file, setFile] = useState<File | null>(null);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [options, setOptions] = useState<any>({});
 
   useEffect(() => {
@@ -19,9 +14,8 @@ export default function HeaderFooterClient() {
       const f = e.detail;
       if (!f) return;
 
-      setFile(f);
-      const url = URL.createObjectURL(f);
-      setPdfUrl(url);
+      const pdfBlobUrl = URL.createObjectURL(f);
+      setFileUrl(pdfBlobUrl);
     };
 
     window.addEventListener("pdf-selected", handler);
@@ -31,8 +25,7 @@ export default function HeaderFooterClient() {
   return (
     <div className="space-y-6 mt-6">
       <HeaderFooterControls onChange={setOptions} />
-
-      {pdfUrl && <HeaderFooterPreview url={pdfUrl} />}
+      {fileUrl && <HeaderFooterPreview pdfUrl={fileUrl} options={options} />}
     </div>
   );
 }
