@@ -8,8 +8,6 @@ import {
   faFileWord,
   faFileExcel,
   faImages,
-  faShieldAlt,
-  faUnlock,
   faSignature,
   faWrench,
   faCogs,
@@ -141,18 +139,6 @@ const tools = [
   },
 
   // SECURITY
-  {
-    name: "Protect PDF",
-    path: "/tools/protect",
-    icon: faShieldAlt,
-    color: "from-gray-600 to-black",
-  },
-  {
-    name: "Unlock PDF",
-    path: "/tools/unlock",
-    icon: faUnlock,
-    color: "from-slate-600 to-gray-900",
-  },
 
   // OCR / AI
   {

@@ -206,6 +206,15 @@ export default function ToolPage({
               if (filesArr[0] && onFileSelected) {
                 onFileSelected(filesArr[0]);
               }
+
+              // 🔥 This sends the file to FileUploader
+              if (filesArr[0]) {
+                window.dispatchEvent(
+                  new CustomEvent("protect-file-selected", {
+                    detail: filesArr[0],
+                  })
+                );
+              }
             }}
           />
 
