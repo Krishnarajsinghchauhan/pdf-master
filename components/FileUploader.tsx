@@ -300,6 +300,30 @@ export default function FileUploader({ tool }: FileUploaderProps) {
     setStatus("completed");
   }
 
+  const applyProtect = async () => {
+    if (files.length === 0 || !password) return;
+
+    setStatus("uploading");
+
+    const uploaded = await uploadToS3(files[0]);
+
+    setStatus("creating-job");
+
+    const jobRes = await fetch("http://localhost:8080/job/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tool: "protect",
+        files: [uploaded],
+        options: { password },
+      }),
+    });
+
+    const jobData = await jobRes.json();
+    setStatus("processing");
+    pollStatus(jobData.job_id);
+  };
+
   // ------------------------------
   // ⭐ STATUS SCREEN
   // ------------------------------
@@ -341,7 +365,6 @@ export default function FileUploader({ tool }: FileUploaderProps) {
           />
         </div>
 
-        {/* PASSWORD FIELD */}
         {files.length > 0 && (
           <div className="border p-6 rounded-xl bg-white shadow-md">
             <label className="font-semibold">Enter Password</label>
@@ -357,7 +380,7 @@ export default function FileUploader({ tool }: FileUploaderProps) {
 
         <motion.button
           whileTap={{ scale: 0.97 }}
-          onClick={onProcess}
+          onClick={applyProtect} // ✅ FIXED
           disabled={files.length === 0 || !password}
           className={`mt-4 w-full py-4 rounded-xl text-white text-lg font-semibold shadow-lg transition
             ${
