@@ -30,6 +30,7 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string>("");
   const [signatures, setSignatures] = useState<any[]>([]);
+  const [password, setPassword] = useState("");
 
   const [status, setStatus] = useState<
     "idle" | "uploading" | "creating-job" | "processing" | "completed" | "error"
@@ -256,7 +257,9 @@ export default function FileUploader({ tool }: FileUploaderProps) {
         tool,
         files: uploadedURLs,
         options:
-          tool === "header-footer"
+          tool === "protect"
+            ? { password }
+            : tool === "header-footer"
             ? (window as any).headerFooterOptions || {}
             : {},
       }),
@@ -324,6 +327,50 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   // ------------------------------
   // ⭐ MAIN PREMIUM UI
   // ------------------------------
+
+  if (tool === "protect") {
+    return (
+      <div className="mt-6 space-y-6">
+        <div className="border p-6 rounded-xl bg-white shadow-md">
+          <label className="font-semibold">Upload PDF</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={(e) => setFiles(Array.from(e.target.files || []))}
+            className="mt-3"
+          />
+        </div>
+
+        {/* PASSWORD FIELD */}
+        {files.length > 0 && (
+          <div className="border p-6 rounded-xl bg-white shadow-md">
+            <label className="font-semibold">Enter Password</label>
+            <input
+              type="password"
+              value={password}
+              placeholder="Enter password"
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-3 w-full border p-3 rounded-md"
+            />
+          </div>
+        )}
+
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={onProcess}
+          disabled={files.length === 0 || !password}
+          className={`mt-4 w-full py-4 rounded-xl text-white text-lg font-semibold shadow-lg transition
+            ${
+              files.length === 0 || !password
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+        >
+          Protect PDF →
+        </motion.button>
+      </div>
+    );
+  }
 
   // ⚡ SPECIAL UI FOR eSIGN
   if (tool === "esign") {
