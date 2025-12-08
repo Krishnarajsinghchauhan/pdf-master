@@ -385,7 +385,7 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 hidden">
       <motion.div
         whileHover={{ scale: 1.02 }}
         className={`border-2 border-dashed rounded-2xl p-12 text-center transition-all cursor-pointer backdrop-blur-lg shadow-lg
