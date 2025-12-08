@@ -29,6 +29,8 @@ interface FileUploaderProps {
 export default function FileUploader({ tool }: FileUploaderProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string>("");
+  const [signatures, setSignatures] = useState<any[]>([]);
+
   const [status, setStatus] = useState<
     "idle" | "uploading" | "creating-job" | "processing" | "completed" | "error"
   >("idle");
@@ -36,11 +38,6 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   const [downloadUrl, setDownloadUrl] = useState<string>("");
 
   // eSign state
-  const [signature, setSignature] = useState<string>("");
-  const [position, setPosition] = useState<{ x: number; y: number }>({
-    x: 0,
-    y: 0,
-  });
 
   // FILE TYPES
   const allowedTypes: Record<string, string[]> = {
@@ -284,13 +281,11 @@ export default function FileUploader({ tool }: FileUploaderProps) {
   });
 
   async function applySignature() {
-    if (files.length === 0 || !signature) return;
+    if (files.length === 0 || !signatures) return;
 
     const body = new FormData();
     body.append("file", files[0]);
-    body.append("signature", signature);
-    body.append("x", String(position.x));
-    body.append("y", String(position.y));
+    body.append("signatures", JSON.stringify(signatures));
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/esign/apply`, {
       method: "POST",
@@ -346,23 +341,38 @@ export default function FileUploader({ tool }: FileUploaderProps) {
         </div>
 
         {/* STEP 2 — Signature Pad */}
-        {files.length > 0 && signature === "" && (
-          <SignaturePad onComplete={(sig) => setSignature(sig)} />
+        {files.length > 0 && signatures.length === 0 && (
+          <SignaturePad
+            onComplete={(sig) => {
+              if (!sig) return;
+
+              setSignatures((prev) => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  image: sig,
+                  x: 100,
+                  y: 100,
+                  size: 150,
+                  rotation: 0,
+                  type: "signature",
+                },
+              ]);
+            }}
+          />
         )}
 
         {/* STEP 3 — PDF Preview + Drag Signature */}
-        {files.length > 0 && signature !== "" && (
+        {files.length > 0 && signatures.length > 0 && (
           <PDFPreviewWithSignature
             file={files[0]}
-            signatures={signature}
-            onPositionChange={(pos: { x: number; y: number }) =>
-              setPosition(pos)
-            }
+            signatures={signatures}
+            setSignatures={setSignatures}
           />
         )}
 
         {/* STEP 4 — Apply Signature Button */}
-        {files.length > 0 && signature !== "" && (
+        {files.length > 0 && signatures.length > 0 && (
           <button
             onClick={applySignature}
             className="w-full py-4 bg-blue-600 text-white rounded-xl font-semibold"
