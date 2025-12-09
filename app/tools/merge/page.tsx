@@ -1,5 +1,5 @@
 import ToolPage from "@/components/ToolPage";
-import FileUploader from "@/components/FileUploader";
+// import FileUploader from "@/components/FileUploader";
 import AdsterraNative from "@/app/ads/AdsterraNative";
 import ToolSEO from "@/components/ToolSEO"; // 🔥 make sure this component exists
 
@@ -10,7 +10,7 @@ export const metadata = {
   title: "Merge PDF Online — Free & Fast PDF Merger | PixelPDF",
   description:
     "Merge multiple PDF files into one instantly. Free, secure, unlimited online PDF merger. No signup required.",
-  alternates: { canonical: "https://pixelpdf.in/tools/merge" },
+  alternates: { canonical: "https://pixelpdf.in/" },
   keywords: [
     "merge pdf",
     "combine pdf",
@@ -33,8 +33,6 @@ export default function MergePDF() {
 
       {/* ⭐ Main Tool Section */}
       <ToolPage title="Merge PDF" tool="merge">
-        <FileUploader tool="merge" />
-
         {/* ⭐ SEO CONTENT */}
         <ToolSEO
           title="Merge PDF Online — Free PDF Merger"
